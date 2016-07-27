@@ -1,0 +1,26 @@
+{
+  "name": "itersquash",
+  "version": "0.0.1",
+  "description": "Iterate squash app",
+  "main": "./app/bin/server.js",
+  "scripts": {
+    "lint": "jshint --exclude ./node_modules,./app/public,./app/tests .",
+    "pretest": "npm run lint",
+    "test": "mocha -R spec ./app/tests/*.js",
+    "dev-start": "nodemon -e \"hbs hs json\" ./app/bin/server.js | bunyan",
+    "start": "node ./app/bin/server.js | bunyan"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iterate/itersquashv2.git"
+  },
+  "author": "Magnus Lien",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/iterate/itersquashv2/issues"
+  },
+  "homepage": "https://github.com/iterate/itersquashv2#readme",
+  "devDependencies": {
+    "jshint": "^2.9.2"
+  }
+}
