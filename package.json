@@ -22,5 +22,16 @@
   "homepage": "https://github.com/iterate/itersquashv2#readme",
   "devDependencies": {
     "jshint": "^2.9.2"
+  },
+  "dependencies": {
+    "browserify": "^13.1.0",
+    "bunyan": "^1.8.1",
+    "compression": "^1.6.2",
+    "convict": "^1.4.0",
+    "cors": "^2.7.1",
+    "express": "^4.14.0",
+    "hbs": "^4.0.0",
+    "path": "^0.12.7",
+    "sw-precache": "^4.0.0"
   }
 }
