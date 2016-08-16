@@ -1,3 +1,5 @@
 node_modules
 public/service-worker
 .DS_Store
+elm-stuff
+app/public/static/elm.js

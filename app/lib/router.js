@@ -23,7 +23,7 @@ router.get('*', (req, res, next) => {
 // Default route
 
 router.get('/', (req, res) => {
-    res.status(200).render('../client/views/index.hbs');
+    res.status(200).render('../client/views/index.html');
 });
 
 
