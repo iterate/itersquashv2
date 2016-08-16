@@ -89,6 +89,13 @@ let conf = convict({
         format  : String,
         default : "debug",
         env     : "LOG_LEVEL",
+    },
+
+    db: {
+        doc     : "Database connection string",
+        format  : String,
+        default : "mongodb://localhost:27017/default",
+        env     : "DB_STRING",
     }
 });
 
