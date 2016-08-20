@@ -1,7 +1,7 @@
 "use strict";
 
 const http            = require('http'),
-      hbs             = require('hbs'),
+      ejs             = require('ejs'),
       path            = require('path'),
       express         = require('express'),
       compress        = require('compression')(),
@@ -15,8 +15,8 @@ const http            = require('http'),
 
 // Set up handlebars as template engine
 
-hbs.registerPartials(path.resolve(__dirname, '../client/views/partials/'));
-app.set('view engine', 'hbs');
+app.engine('html', require('ejs').renderFile);
+app.set('view engine', 'html');
 app.set('views', [__dirname, '../client/views/']);
 
 
