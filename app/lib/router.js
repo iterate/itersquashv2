@@ -4,7 +4,9 @@
 const express     = require('express'),
       browserify  = require('browserify'),
       config      = require('../config/config.js'),
-      log         = require('../bin/log.js');
+      log         = require('../bin/log.js'),
+      url         = require('url'),
+      mail        = require('./mail.js');
 
 const router      = express.Router();
 
@@ -38,7 +40,24 @@ router.get('/bundle.js', function (req, res) {
     .pipe(res);
 });
 
+//mail
 
+router.get('/invite', (req, res, next) => {
+    const urlObj = url.parse(req.url, true);
+    const recipients = urlObj.query.recipients;
+
+    if(!recipients) {
+        throw Error("No recipients found. Example: /invite?recipients=foo@baz.com,bar@bizz.com");
+    }
+
+    mail.send(recipients)
+        .then(() => {
+            res.status(200).send("Mail sent successfully!");
+            return;
+        }).catch((err) => {
+            return next(err);
+       });
+});
 
 // Health check
 

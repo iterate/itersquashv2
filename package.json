@@ -30,8 +30,11 @@
     "convict": "^1.4.0",
     "cors": "^2.7.1",
     "express": "^4.14.0",
+    "handlebars": "^4.0.5",
     "hbs": "^4.0.0",
+    "nodemailer": "^2.5.0",
     "path": "^0.12.7",
-    "sw-precache": "^4.0.0"
+    "sw-precache": "^4.0.0",
+    "url": "^0.11.0"
   }
 }

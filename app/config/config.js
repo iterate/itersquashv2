@@ -96,6 +96,20 @@ let conf = convict({
         format  : String,
         default : "mongodb://localhost:27017/default",
         env     : "DB_STRING",
+    },
+
+    mailAccount: {
+        doc     : "Mail account for sending mail",
+        format  : String,
+        default : "itersquash%40gmail.com",
+        env     : "MAIL",
+    },
+
+    mailPassword: {
+        doc     : "Password to mail account",
+        format  : String,
+        default : "squashisawesome",
+        env     : "MAIL_PW",
     }
 });
 
