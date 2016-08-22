@@ -2,12 +2,11 @@
 
 const   config     = require('../config/config'),
         hbs        = require('handlebars'),
-        nodemailer = require('nodemailer'),
-        Promise    = require('bluebird');
+        nodemailer = require('nodemailer');
 
 // create reusable transporter object using the default SMTP transport
-const transporter = Promise.promisifyAll(nodemailer.createTransport(`smtps://${config.get('mailAccount')}:${config.get('mailPassword')}@smtp.gmail.com`)),
-      fs          = Promise.promisifyAll(require('fs'));
+const transporter = nodemailer.createTransport(`smtps://${config.get('mailAccount')}:${config.get('mailPassword')}@smtp.gmail.com`),
+      fs          = require('fs');
 
 // setup e-mail data with unicode symbols
 const mailOptions = {
@@ -18,30 +17,38 @@ const mailOptions = {
 };
 
 function send(recipients, data) {
-    return fs.readFileAsync(__dirname+'/mail.hbs', "utf-8")
-        .catch((err) => {
-            throw Error("Could not open mail template. " + err);
-        })
-        .then((template) => {
-            return hbs.compile(template);
-        })
-        .then((compiledTemplate) => {
-            return compiledTemplate(data);
-        })
-        .then((html) => {
-            let options = mailOptions;
+    return new Promise((resolve, reject) => {
+         fs.readFile(__dirname+'/mail.hbs', "utf-8", (err, template) => {
+             if(err) {
+                return reject(err);
+             }else {
+                return resolve(template);
+             }
+         });
+    })
+    .catch((err) => {
+        throw Error("Could not open mail template. " + err);
+    })
+    .then((template) => {
+        return hbs.compile(template);
+    })
+    .then((compiledTemplate) => {
+        return compiledTemplate(data);
+    })
+    .then((html) => {
+        let options = mailOptions;
 
-            options.to = (recipients instanceof Array) ? recipients.join(', ') : recipients.toString();
+        options.to = (recipients instanceof Array) ? recipients.join(', ') : recipients.toString();
 
-            options.html = html;
+        options.html = html;
 
-            transporter.sendMailAsync(options);
+        transporter.sendMail(options);
 
-            return true;
+        return true;
 
-        }).catch((err) => {
-            throw Error("Could not send mail. " + err);
-        });
+    }).catch((err) => {
+        throw Error("Could not send mail. " + err);
+    });
 }
 
 module.exports.send = send;
