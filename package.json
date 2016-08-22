@@ -39,7 +39,6 @@
     "hbs": "4.0.0",
     "mongodb": "2.2.7",
     "nodemailer": "2.5.0",
-    "nodemon": "1.10.2",
     "path": "0.12.7",
     "sw-precache": "4.0.0",
     "url": "0.11.0"
