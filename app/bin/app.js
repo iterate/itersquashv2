@@ -1,7 +1,6 @@
 "use strict";
 
 const http            = require('http'),
-      ejs             = require('ejs'),
       path            = require('path'),
       express         = require('express'),
       compress        = require('compression')(),
