@@ -23,7 +23,7 @@ function open(){
             });
         }
     });
-};
+}
 
 function close(){
     if(database) {

@@ -3,6 +3,9 @@
   "version": "0.0.1",
   "description": "Iterate squash app",
   "main": "./app/bin/server.js",
+  "engines" : {
+    "node" : "6.2.1"
+  },
   "scripts": {
     "lint": "jshint --exclude ./node_modules,./app/public,./app/tests .",
     "pretest": "npm run lint",
