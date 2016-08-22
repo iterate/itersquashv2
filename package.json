@@ -27,6 +27,7 @@
     "nodemon": "1.10.0"
   },
   "dependencies": {
+    "bluebird": "3.4.1",
     "browserify": "13.1.0",
     "bunyan": "1.8.1",
     "compression": "1.6.2",
@@ -36,7 +37,9 @@
     "express": "4.14.0",
     "handlebars": "4.0.5",
     "hbs": "4.0.0",
+    "mongodb": "2.2.7",
     "nodemailer": "2.5.0",
+    "nodemon": "1.10.2",
     "path": "0.12.7",
     "sw-precache": "4.0.0",
     "url": "0.11.0"
