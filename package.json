@@ -7,10 +7,8 @@
     "lint": "jshint --exclude ./node_modules,./app/public,./app/tests .",
     "pretest": "npm run lint",
     "test": "mocha -R spec ./app/tests/*.js",
-    "dev-start": "nodemon -e \"hs json\" ./app/bin/server.js | bunyan",
-    "start": "node ./app/bin/server.js | bunyan",
-    "prestart": "npm run build-client",
-    "build-client": "elm make ./client/main.elm --output=\"./app/public/static/elm.js\""
+    "dev-start": "gulp | bunyan",
+    "start": "gulp compile && node ./app/bin/server.js | bunyan"
   },
   "repository": {
     "type": "git",
@@ -23,6 +21,10 @@
   },
   "homepage": "https://github.com/iterate/itersquashv2#readme",
   "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-concat-css": "^2.3.0",
+    "gulp-elm": "^0.5.0",
+    "gulp-nodemon": "^2.1.0",
     "jshint": "2.9.2",
     "nodemon": "1.10.0"
   },
