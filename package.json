@@ -4,9 +4,9 @@
   "description": "Iterate squash app",
   "main": "./app/bin/server.js",
   "scripts": {
-    "lint": "jshint --exclude ./node_modules,./app/public,./app/tests .",
+    "lint": "jshint --exclude ./node_modules,./client/public,./client/src",
     "pretest": "npm run lint",
-    "test": "mocha -R spec ./app/tests/*.js",
+    "test": "tap -R spec ./app/tests/*.js",
     "dev-start": "gulp | bunyan",
     "start": "gulp compile && node ./app/bin/server.js | bunyan"
   },
@@ -26,10 +26,12 @@
     "gulp-elm": "^0.5.0",
     "gulp-nodemon": "^2.1.0",
     "jshint": "2.9.2",
-    "nodemon": "1.10.0"
+    "nodemon": "1.10.0",
+    "tap": "^7.1.2"
   },
   "dependencies": {
     "bluebird": "3.4.1",
+    "body-parser": "^1.15.2",
     "browserify": "13.1.0",
     "bunyan": "1.8.1",
     "compression": "1.6.2",
@@ -40,6 +42,7 @@
     "handlebars": "4.0.5",
     "hbs": "4.0.0",
     "mongodb": "2.2.7",
+    "mongoose": "^4.6.2",
     "nodemailer": "2.5.0",
     "path": "0.12.7",
     "sw-precache": "4.0.0",

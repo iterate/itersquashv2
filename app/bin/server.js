@@ -5,24 +5,16 @@
 
 const config      = require('../config/config.js'),
       server      = require('./app.js'),
-      log         = require('./log.js'),
-      fs          = require('fs'),
-      db          = require('./db');
+      log         = require('../lib/log.js'),
+      db          = require('../storage/db');
 
 
 
 // Start application
 
 server.listen(config.get('httpServerPort'), () => {
-    db.open();
-    fs.readFile('./.art', "ASCII", function(err, data) {
-        if(!err) {
-            log.info(data);
-        }
-
-        log.info('server running at http://localhost:' + server.address().port);
-        log.info('server process has pid ' + process.pid);
-    });
+    log.info('server running at http://localhost:' + server.address().port);
+    log.info('server process has pid ' + process.pid);
 });
 
 
