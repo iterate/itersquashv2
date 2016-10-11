@@ -1,8 +1,8 @@
-"use strict"
+"use strict";
 
 let mongoClient = require('mongodb').MongoClient,
     Promise     = require('bluebird'),
-    log         = require('./log'),
+    log         = require('../lib/log'),
     config      = require('../config/config');
 
 let database;
@@ -24,7 +24,7 @@ function open(){
             });
         }
     });
-};
+}
 
 function close(){
     if(database) {

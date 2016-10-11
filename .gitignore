@@ -1,5 +1,4 @@
 node_modules
-public/service-worker
+client/public
 .DS_Store
 elm-stuff
-app/public/static/elm.js

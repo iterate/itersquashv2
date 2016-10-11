@@ -81,7 +81,7 @@ let conf = convict({
     docRoot: {
         doc     : "Document root for static files to be served by the http server",
         format  : String,
-        default : "./app/public"
+        default : "./client/public"
     },
 
     consoleLogLevel: {
