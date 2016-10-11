@@ -51,7 +51,7 @@ mongoose.connect(config.get('db'));
 log.info('Compiling service worker script with pre-cached resources.');
 swPrecache.write(path.resolve('client/public') +'/sw.js',
 {
-  staticFileGlobs: [path.resolve('client/public') + '/**/*.{js,html,css,png,jpg,gif,svg,eot,ttf,woff}'],
+  staticFileGlobs: [path.resolve('client/public') + '/**/*.{js,css,png,jpg,gif,svg,eot,ttf,woff}'],
   stripPrefix: [path.resolve('client/public')],
   verbose: true,
   runtimeCaching : [{
@@ -63,7 +63,11 @@ swPrecache.write(path.resolve('client/public') +'/sw.js',
       handler: 'cacheFirst'
   },
   {
-      urlPattern: '/service-worker\.js/',
+      urlPattern: '/r/*',
+      handler: 'cacheFirst'
+  },
+  {
+      urlPattern: '/api/*',
       handler: 'networkFirst'
   }
 ]
