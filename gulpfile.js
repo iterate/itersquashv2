@@ -12,7 +12,7 @@ const   gulp
 gulp.task('elm-init', elm.init);
 
 gulp.task('elm-compile', ['elm-init'], function(){
-  return gulp.src('client/src/*.elm')
+  return gulp.src('client/src/elm/*.elm')
     .pipe(elm.bundle('bundle.js'), {"yesToAllPrompts": true, "elmMake": true})
     .pipe(gulp.dest('client/public/'));
 });

@@ -6,23 +6,27 @@ import Html.App
 import Html.Attributes exposing (placeholder, maxlength,type', autofocus, id, class)
 import Html exposing (Html, button, div, text, input, h1, p)
 import Html.Events exposing (onClick, onInput, onSubmit)
-import Json.Decode exposing (..)
 import Json.Encode exposing (encode)
 import Http
 import Task
 
 --LOCAL MODULES
-import Room exposing (..)
+import Models exposing (RoomModel, Entry)
+import Messages exposing (..)
+import Decoders as Dec exposing (..)
+import Views.ListItem exposing (listItems)
 
 
 main =
     Html.App.programWithFlags
-    { init = init,
-    update = update,
-    view = view,
-    subscriptions = subscriptions
+    {   init = init,
+        update = update,
+        view = view,
+        subscriptions = subscriptions
     }
 
+-- For "safety" we create a type alias for application input from the page
+type alias Flags = { room: String }
 
 --Initialize model/application state
 init : Flags -> (RoomModel, Cmd Msg)
@@ -31,16 +35,6 @@ init flags =
         { room } = flags
     in
         ( RoomModel [] room "This is a description" (Entry ""), getEntries room)
-
-
--- Define a few custom types for managing the state and data flows
-type Msg =
-    NoOp
-    | Input String
-    | Store
-    | SendFail Http.Error
-    | SendSuccess { entries: List Entry, title: String, description: String}
-
 
 -- UPDATE
 -- Updates application model/state
@@ -51,21 +45,21 @@ update msg model =
             ( model, Cmd.none )
 
         Input name ->
-            ( RoomModel model.entries model.title model.description (Entry name), Cmd.none)
+            ( RoomModel model.entries model.title model.description (Entry name), Cmd.none )
 
         Store ->
-            ( model, (postEntries ("/api/" ++ model.title ++ "/entry") ((\entry -> entry.name) model.currentEntry)))
+            ( model, (postEntries ("/api/" ++ model.title ++ "/entry") ((\entry -> entry.name) model.currentEntry )))
 
         SendFail error ->
                 ( model, Cmd.none )
         SendSuccess data ->
-            ({model | entries = data.entries, title = data.title, description = data.description}, Cmd.none)
+            ({ model | entries = data.entries, title = data.title, description = data.description}, Cmd.none )
 
 
 -- Fetch room data
 getEntries: String -> Cmd Msg
 getEntries title =
-        Task.perform SendFail SendSuccess (Http.get roomDecoder ("/api/" ++ title))
+        Task.perform SendFail SendSuccess ( Http.get Dec.roomDecoder ("/api/" ++ title ))
 
 
 -- Params for http PUT requests with json payload (updating entries)
@@ -77,30 +71,13 @@ requestParams url encName =
     , body = encName
     }
 
-
 -- Encode an entry and send to server
 postEntries: String -> String -> Cmd Msg
 postEntries url currentEntry =
     let
         encodedCurrent = Http.string( encode 1 (Json.Encode.object [("name", Json.Encode.string currentEntry)]))
     in
-        (Task.perform SendFail SendSuccess (Http.fromJson roomDecoder (Http.send Http.defaultSettings (requestParams url encodedCurrent))))
-
-
--- Decodes room JSON objects
-roomDecoder: Json.Decode.Decoder {entries: List Entry, title: String, description: String}
-roomDecoder =
-    object3 (\entries -> \title -> \description -> {entries=entries, title=title, description=description})
-        ("entries" := (list entryDecoder))
-        ("title" := string)
-        ("description" := string)
-
-
---Decodes entry JSON objects
-entryDecoder: Json.Decode.Decoder { name: String }
-entryDecoder =
-    object1 (\name -> { name=name })
-        ("name" := string)
+        (Task.perform SendFail SendSuccess (Http.fromJson Dec.roomDecoder (Http.send Http.defaultSettings (requestParams url encodedCurrent))))
 
 
 -- SUBSCRIPTIONS
@@ -110,12 +87,6 @@ subscriptions model =
 
 
 -- VIEW
---Writes out entries
-listItem : {a | name: String} -> Html Msg
-listItem entry =
-    div [] [ text (entry.name) ]
-
-
 --The main view
 view : RoomModel -> Html Msg
 view model =
@@ -138,7 +109,7 @@ view model =
                     [  div [ class "row" ]
                         [
                             div [class "entries"]
-                            (List.map listItem model.entries)
+                            (listItems model.entries)
                         ]
                     ]
                 ]
