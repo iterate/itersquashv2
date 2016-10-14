@@ -1,10 +1,10 @@
 {
   "name": "itersquash",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Iterate squash app",
   "main": "./app/bin/server.js",
-  "engines" : {
-    "node" : "6.2.1"
+  "engines": {
+    "node": "6.2.1"
   },
   "scripts": {
     "lint": "jshint --exclude ./node_modules,./client/public,./client/src",
