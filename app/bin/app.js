@@ -1,49 +1,75 @@
 "use strict";
 
-const http            = require('http'),
-      path            = require('path'),
-      express         = require('express'),
-      compress        = require('compression')(),
-      cors            = require('cors'),
-      log             = require('./log.js'),
-      router          = require('../lib/router.js'),
-      app             = express(),
-      swPrecache      = require('sw-precache');
+const http
+        = require('http'),
+      path
+        = require('path'),
+      express
+        = require('express'),
+      compress
+        = require('compression')(),
+      cors
+        = require('cors'),
+      log
+        = require('../lib/log.js'),
+      router
+        = require('../lib/router.js'),
+      app
+        = express(),
+      swPrecache
+        = require('sw-precache'),
+      config
+        = require('../config/config'),
+      db
+        = require('../storage/db'),
+      mongoose
+        = require('mongoose'),
+      fs
+        = require('fs');
 
+
+
+//ASCII Art
+fs.readFile('./.art', "ASCII", function(err, data) {
+    if(!err) {
+        log.info(data);
+    }
+});
 
 
 // Set up handlebars as template engine
 
 app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'html');
-app.set('views', [__dirname, '../client/views/']);
+app.set('views', path.resolve('client/public'));
 
+// Set up mongo database and connect mongoose to it
+db.open();
+mongoose.connect(config.get('db'));
 
 
 // Create service worker
-
-swPrecache.write(path.resolve(__dirname+'/../public/service-worker.js'),
+log.info('Compiling service worker script with pre-cached resources.');
+swPrecache.write(path.resolve('client/public') +'/sw.js',
 {
-  staticFileGlobs: [__dirname + '/../public/images' +'/**/*.{js,html,css,png,jpg,gif,svg,eot,ttf,woff}'],
-  stripPrefix: '/Users/magnuslien/opt/amedia/morro/googledev_progressive/app/public',
+  staticFileGlobs: [path.resolve('client/public') + '/**/*.{js,css,png,jpg,gif,svg,eot,ttf,woff}'],
+  stripPrefix: [path.resolve('client/public')],
   verbose: true,
   runtimeCaching : [{
-      urlPattern: '/images/',
-      handler: 'cacheFirst',
-      options: {
-          cache: {
-              maxEntries: 1,
-              name: 'images-cache'
-          }
-      }
-  },
-  {
       urlPattern: '/bundle\.js/',
       handler: 'cacheFirst'
   },
   {
-      urlPattern: '/service-worker\.js/',
+      urlPattern: '/\.css/',
       handler: 'cacheFirst'
+  },
+  {
+      urlPattern: '/r/*',
+      handler: 'cacheFirst'
+  },
+  {
+      urlPattern: '/api/*',
+      handler: 'networkFirst'
   }
 ]
 });
