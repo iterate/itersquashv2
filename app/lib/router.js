@@ -86,11 +86,7 @@ router.get('/api/:title', (req, res, next) => {
         .then((room) => {
             //If a room with the given title doesnt exist, we create it
             if(!room){
-                let newRoom = new models.Room({ title: req.params.title, description: "Tommelomt", entries: []});
-                //Save persists the new room to the database
-                newRoom.save();
-
-                res.status(200).json(newRoom);
+                res.status(404).json({error: "Room not found"});
             }else {
                 res.status(200).json(room);
             }

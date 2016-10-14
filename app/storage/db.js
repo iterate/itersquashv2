@@ -1,7 +1,7 @@
 "use strict";
 
 let mongoClient = require('mongodb').MongoClient,
-    log         = require('./log'),
+    log         = require('../lib/log'),
     config      = require('../config/config');
 
 let database;

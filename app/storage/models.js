@@ -2,6 +2,8 @@
 
 let mongoose = require('mongoose');
 
+    mongoose.Promise = Promise;
+
 /*
 * Model to represent entries/participants to an event
 */
