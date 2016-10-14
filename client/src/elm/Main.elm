@@ -13,7 +13,7 @@ import Task
 --LOCAL MODULES
 import Models exposing (RoomModel, Entry)
 import Messages exposing (..)
-import Decoders as Dec exposing (..)
+import Decoders exposing (roomDecoder)
 import Views.ListItem exposing (listItems)
 
 
@@ -59,7 +59,7 @@ update msg model =
 -- Fetch room data
 getEntries: String -> Cmd Msg
 getEntries title =
-        Task.perform SendFail SendSuccess ( Http.get Dec.roomDecoder ("/api/" ++ title ))
+        Task.perform SendFail SendSuccess ( Http.get roomDecoder ("/api/" ++ title ))
 
 
 -- Params for http PUT requests with json payload (updating entries)
@@ -77,7 +77,7 @@ postEntries url currentEntry =
     let
         encodedCurrent = Http.string( encode 1 (Json.Encode.object [("name", Json.Encode.string currentEntry)]))
     in
-        (Task.perform SendFail SendSuccess (Http.fromJson Dec.roomDecoder (Http.send Http.defaultSettings (requestParams url encodedCurrent))))
+        (Task.perform SendFail SendSuccess (Http.fromJson roomDecoder (Http.send Http.defaultSettings (requestParams url encodedCurrent))))
 
 
 -- SUBSCRIPTIONS
