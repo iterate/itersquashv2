@@ -11,8 +11,9 @@ import Json.Encode exposing (encode)
 import Http
 import Task
 
--- Just for debugging
--- import Debug exposing (log)
+--LOCAL MODULES
+import Room exposing (..)
+
 
 main =
     Html.App.programWithFlags
@@ -22,12 +23,6 @@ main =
     subscriptions = subscriptions
     }
 
--- MODEL
-type alias Entry = { name: String }
-type alias RoomModel = { entries : List Entry, title: String, description: String, currentEntry: Entry}
-
--- For "safety" we create a type alias for application input from the page
-type alias Flags = { room: String }
 
 --Initialize model/application state
 init : Flags -> (RoomModel, Cmd Msg)
