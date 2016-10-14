@@ -5,16 +5,24 @@
 
 ## Setup
 
-First install packages: `npm i`
+This project use the `[yarn](https://github.com/yarnpkg/yarn "Yarn")` package manager. Why? Ensuring consistent package behavior across environments. _Remember to commit the `yarn.lock` when you add or change modules_
 
-Run with `npm start`, or `npm run dev-start` for live reloading.
+Use `yarn` wherever you would use `npm`.
+
+
+ ```
+ npm install -g yarn && yarn
+ ```
+
+Run with `yarn start`, or `yarn run dev-start` for live reloading.
+
 
 ## Testing
 
 This project use jshint and tap for code validation and testing.
 
-Lint code with: `npm run lint`
-Run tests: `npm test`
+Lint code with: `yarn run lint`
+Run tests: `yarn test`
 
 
 ## Configuration

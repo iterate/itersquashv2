@@ -7,9 +7,8 @@
     "node": "6.2.1"
   },
   "scripts": {
-    "lint": "jshint --exclude ./node_modules,./client/public,./client/src",
-    "pretest": "npm run lint",
-    "test": "tap -R spec ./app/tests/*.js",
+    "lint": "jshint --exclude ./node_modules,./client",
+    "test": "'tap -R spec app/tests/*.js'",
     "dev-start": "gulp | bunyan",
     "start": "gulp compile && node ./app/bin/server.js | bunyan"
   },
