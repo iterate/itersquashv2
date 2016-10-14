@@ -11,7 +11,7 @@ Run with `npm start`, or `npm run dev-start` for live reloading.
 
 ## Testing
 
-This project use jshint and mocha for code validation and testing.
+This project use jshint and tap for code validation and testing.
 
 Lint code with: `npm run lint`
 Run tests: `npm test`
