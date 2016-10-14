@@ -1,5 +1,6 @@
 module Main exposing (..)
 
+--CORE & COMMUNITY MODULES/PACKAGES
 import Html
 import Html.App
 import Html.Attributes exposing (placeholder, maxlength,type', autofocus, id, class)
@@ -36,6 +37,7 @@ init flags =
     in
         ( RoomModel [] room "This is a description" (Entry ""), getEntries room)
 
+
 -- Define a few custom types for managing the state and data flows
 type Msg =
     NoOp
@@ -43,6 +45,7 @@ type Msg =
     | Store
     | SendFail Http.Error
     | SendSuccess { entries: List Entry, title: String, description: String}
+
 
 -- UPDATE
 -- Updates application model/state
@@ -59,9 +62,6 @@ update msg model =
             ( model, (postEntries ("/api/" ++ model.title ++ "/entry") ((\entry -> entry.name) model.currentEntry)))
 
         SendFail error ->
-            -- let
-            --     -- _ = (log "Elm error" error)
-            -- in
                 ( model, Cmd.none )
         SendSuccess data ->
             ({model | entries = data.entries, title = data.title, description = data.description}, Cmd.none)
@@ -72,6 +72,7 @@ getEntries: String -> Cmd Msg
 getEntries title =
         Task.perform SendFail SendSuccess (Http.get roomDecoder ("/api/" ++ title))
 
+
 -- Params for http PUT requests with json payload (updating entries)
 requestParams : String -> Http.Body -> Http.Request
 requestParams url encName =
@@ -81,6 +82,7 @@ requestParams url encName =
     , body = encName
     }
 
+
 -- Encode an entry and send to server
 postEntries: String -> String -> Cmd Msg
 postEntries url currentEntry =
@@ -88,6 +90,7 @@ postEntries url currentEntry =
         encodedCurrent = Http.string( encode 1 (Json.Encode.object [("name", Json.Encode.string currentEntry)]))
     in
         (Task.perform SendFail SendSuccess (Http.fromJson roomDecoder (Http.send Http.defaultSettings (requestParams url encodedCurrent))))
+
 
 -- Decodes room JSON objects
 roomDecoder: Json.Decode.Decoder {entries: List Entry, title: String, description: String}
@@ -97,11 +100,13 @@ roomDecoder =
         ("title" := string)
         ("description" := string)
 
+
 --Decodes entry JSON objects
 entryDecoder: Json.Decode.Decoder { name: String }
 entryDecoder =
     object1 (\name -> { name=name })
         ("name" := string)
+
 
 -- SUBSCRIPTIONS
 subscriptions : RoomModel -> Sub Msg
@@ -110,11 +115,11 @@ subscriptions model =
 
 
 -- VIEW
-
 --Writes out entries
 listItem : {a | name: String} -> Html Msg
 listItem entry =
     div [] [ text (entry.name) ]
+
 
 --The main view
 view : RoomModel -> Html Msg
