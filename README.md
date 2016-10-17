@@ -5,7 +5,22 @@
 
 ## Setup
 
-First install packages: `npm i`
+### Postgresql DB
+Install PostgreSQL. Connect to the default template database with a superuser, typically `postgres`.
+```
+su - postgres
+psql -d template1 -U postgres
+```
+Create a database and a user, and grant this user access.
+```
+CREATE DATABASE itervent;
+CREATE USER itervent WITH PASSWORD 'test';
+GRANT ALL PRIVILEGES ON DATABASE itervent to itervent;
+```
+
+### Node
+
+Install packages: `npm i`
 
 Run with `npm start`, or `npm run dev-start` for live reloading.
 

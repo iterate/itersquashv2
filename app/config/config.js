@@ -91,11 +91,11 @@ let conf = convict({
         env     : "LOG_LEVEL",
     },
 
-    db: {
-        doc     : "Database connection string",
+    dbURL: {
+        doc     : "Database connectionstring, URI formatted. postgres://[username]:[password]@[host]:[port]/[database]",
         format  : String,
-        default : "mongodb://localhost:27017/default",
-        env     : "DB_STRING",
+        default : "postgresql://itervent:test@localhost:5432/itervent",
+        env     : "DATABSE_URL",
     },
 
     mailAccount: {

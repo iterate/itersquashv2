@@ -13,8 +13,10 @@ const express
         = require('url'),
     mail
         = require('./mail.js'),
-    models
-        = require('../storage/models'),
+    storage
+        = require('../storage'),
+    Promise
+        = require('bluebird'),
     router
         = express.Router();
 
@@ -30,21 +32,30 @@ router.all('*', (req, res, next) => {
 //Client app endpoint
 
 router.get('/r/:title', (req, res, next) => {
-    models.Room.findOne({ 'title': req.params.title })
-        .exec()
-        .then((room) => {
-            //If a room with the given title doesnt exist, we create it
-            if(!room){
-                let newRoom = new models.Room({ title: req.params.title, description: "Tommelomt", entries: []});
-                //Save persists the new room to the database
-                newRoom.save();
-            }
 
-            res.status(200).render('index.html');
-        })
-        .catch((err) => {
-            next(err);
+storage.Room
+    .sync()
+    .then(() => {
+        return storage.Room.findOrCreate({
+            include: [ storage.Entry ],
+            where: {
+                title: req.params.title
+            },
+            defaults: {
+                description: ""
+            }
         });
+    })
+    .spread((roomDAO, created) => {
+        return roomDAO.get({ plain: true});
+    })
+    .then(() => {
+        return res.status(200).render('index.html');
+    })
+    .catch((err) => {
+        next(err);
+    });
+
 });
 
 
@@ -52,28 +63,37 @@ router.get('/r/:title', (req, res, next) => {
 //This doesn't update existing ones yet
 
 router.put('/api/:title/entry', bodyParser.json(), (req, res, next) => {
-    let content = req.body || {};
 
-    //Todo, should probably have some better input validation on this
-    if (content.name) {
-        models.Room.findOne({ 'title': req.params.title })
-            .exec()
-            .then((room) => {
-                if(!room){
-                    res.status(403).json({ error: "You cannot sign up to an event that does not exist!" });
-                }else {
-                    room.entries.push({ name: content.name });
-                    room.save();
-
-                    res.status(200).json(room);
-                }
+Promise.all([storage.Room.sync(), storage.Entry.sync()])
+    .spread((room, entry) => {
+        return room.findOne({
+            where: {
+                title: req.params.title
+            },
+            defaults: {
+                description: ""
+            }
+        })
+        .then((roomDAO) => {
+            //TODO: Handle no room
+            return entry.create({
+                name: req.body.name ? req.body.name : "Anonymous Andy",
+                roomid: roomDAO.dataValues.id
             })
-            .catch((err) => {
-                next(err);
+            .then(() => {
+                return room;
             });
-    }else {
-        res.status(400).json({ error: "Invalid JSON in request body!"});
-    }
+        });
+    })
+    .then((roomDAO) => {
+        return roomDAO.get({ plain: true });
+    })
+    .then((room) => {
+        return res.status(200).json(room);
+    })
+    .catch((err) => {
+        next(err);
+    });
 });
 
 
@@ -81,20 +101,29 @@ router.put('/api/:title/entry', bodyParser.json(), (req, res, next) => {
 
 router.get('/api/:title', (req, res, next) => {
 
-    models.Room.findOne({ 'title': req.params.title })
-        .exec()
+    storage.Room
+        .sync()
+        .then(() => {
+            return storage.Room.findOrCreate({
+                include: [ storage.Entry ],
+                where: {
+                    title: req.params.title
+                },
+                defaults: {
+                    description: ""
+                }
+            });
+        })
+        .spread((room, created) => {
+            return room.get({ plain: true});
+
+        })
         .then((room) => {
-            //If a room with the given title doesnt exist, we create it
-            if(!room){
-                res.status(404).json({error: "Room not found"});
-            }else {
-                res.status(200).json(room);
-            }
+            return res.status(200).json(room);
         })
         .catch((err) => {
             next(err);
         });
-
 });
 
 

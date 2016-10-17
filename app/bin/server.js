@@ -5,8 +5,7 @@
 
 const config      = require('../config/config.js'),
       server      = require('./app.js'),
-      log         = require('../lib/log.js'),
-      db          = require('../storage/db');
+      log         = require('../lib/log.js');
 
 
 
@@ -26,7 +25,6 @@ process.on('uncaughtException', (error) => {
     log.error('shutdown - server taken down by force due to a uncaughtException');
     log.error(error.message);
     log.error(error.stack);
-    db.close();
     server.close();
     process.nextTick(() => {
         process.exit(1);
@@ -39,7 +37,6 @@ process.on('uncaughtException', (error) => {
 
 process.on('SIGINT', () => {
     log.info('shutdown - got SIGINT - taking down server gracefully');
-    db.close();
     server.close();
     process.nextTick(() => {
         process.exit(0);
@@ -52,7 +49,6 @@ process.on('SIGINT', () => {
 
 process.on('SIGTERM', () => {
     log.info('shutdown - got SIGTERM - taking down server gracefully');
-    db.close();
     server.close();
     process.nextTick(() => {
         process.exit(0);
