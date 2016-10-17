@@ -8,7 +8,7 @@
   },
   "scripts": {
     "lint": "jshint --exclude ./node_modules,./client",
-    "test": "'tap -R spec app/tests/*.js'",
+    "test": "tap -R spec app/tests/*.js",
     "dev-start": "gulp | bunyan",
     "start": "gulp compile && node ./app/bin/server.js | bunyan"
   },
