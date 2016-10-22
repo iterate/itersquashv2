@@ -5,12 +5,12 @@ const   config     = require('../config/config'),
         nodemailer = require('nodemailer');
 
 // create reusable transporter object using the default SMTP transport
-const transporter = nodemailer.createTransport(`smtps://${config.get('mailAccount')}:${config.get('mailPassword')}@smtp.gmail.com`),
+const transporter = nodemailer.createTransport(config.get('mailAccount')),
       fs          = require('fs');
 
 // setup e-mail data with unicode symbols
 const mailOptions = {
-    from: `"Squashbot 👥" <${config.get('mailAccount')}>`, // sender address
+    from: "Squashbot 👥", // sender address
     subject: 'Bli med på squash? 🎾', // Subject line
     plaintext: ' ',
     logger: true //logs to stdout

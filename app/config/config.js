@@ -101,15 +101,8 @@ let conf = convict({
     mailAccount: {
         doc     : "Mail account for sending mail",
         format  : String,
-        default : "itersquash%40gmail.com",
-        env     : "MAIL",
-    },
-
-    mailPassword: {
-        doc     : "Password to mail account",
-        format  : String,
-        default : "squashisawesome",
-        env     : "MAIL_PW",
+        default : "smtps://itersquash%40gmail.com:squashisawesome@smtp.gmail.com",
+        env     : "MAIL_URL",
     }
 });
 
