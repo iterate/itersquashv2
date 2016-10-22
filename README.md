@@ -18,14 +18,14 @@ CREATE USER itervent WITH PASSWORD 'test';
 GRANT ALL PRIVILEGES ON DATABASE itervent to itervent;
 ```
 
-### Node
+### Run with docker (optional)
+First [get docker compose](https://docs.docker.com/compose/install/).
 
-This project use the `[yarn](https://github.com/yarnpkg/yarn "Yarn")` package manager. Why? Ensuring consistent package behavior across environments. _Remember to commit the `yarn.lock` when you add or change modules_
+`docker-compose up`. Add `-d` to run in the background.
 
-Use `yarn` wherever you would use `npm`.
+### Run with Node
 
-NB: There are some issues with running scripts with yarn `v0.15.1`, if `yarn start` and/or `yarn run dev-start` doesn't work, you can use `npm`.
-
+This project use the `[yarn](https://github.com/yarnpkg/yarn "Yarn")` package manager. Why? Ensuring consistent package behavior across environments. _Remember to commit the `yarn.lock` when you add or change modules_. Use `yarn` wherever you would use `npm`.
 
  ```
  npm install -g yarn && yarn

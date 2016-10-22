@@ -1,0 +1,6 @@
+ version: '2'
+ services:
+   itervent:
+     build: .
+     ports:
+      - "9797:9797"
