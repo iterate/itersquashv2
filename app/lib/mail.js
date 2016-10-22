@@ -1,8 +1,13 @@
 "use strict";
 
-const   config     = require('../config/config'),
-        hbs        = require('handlebars'),
-        nodemailer = require('nodemailer');
+const   config
+            = require('../config/config'),
+        hbs
+            = require('handlebars'),
+        nodemailer
+            = require('nodemailer'),
+        path
+            = require('path');
 
 // create reusable transporter object using the default SMTP transport
 const transporter = nodemailer.createTransport(config.get('mailAccount')),
