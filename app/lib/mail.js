@@ -18,7 +18,7 @@ const mailOptions = {
 
 function send(recipients, data) {
     return new Promise((resolve, reject) => {
-         fs.readFile(__dirname+'/mail.hbs', "utf-8", (err, template) => {
+         fs.readFile(path.resolve('../templates/mail.hbs'), "utf-8", (err, template) => {
              if(err) {
                 return reject(err);
              }else {
