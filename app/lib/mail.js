@@ -1,16 +1,21 @@
 "use strict";
 
-const   config     = require('../config/config'),
-        hbs        = require('handlebars'),
-        nodemailer = require('nodemailer');
+const   config
+            = require('../config/config'),
+        hbs
+            = require('handlebars'),
+        nodemailer
+            = require('nodemailer'),
+        path
+            = require('path');
 
 // create reusable transporter object using the default SMTP transport
-const transporter = nodemailer.createTransport(`smtps://${config.get('mailAccount')}:${config.get('mailPassword')}@smtp.gmail.com`),
+const transporter = nodemailer.createTransport(config.get('mailAccount')),
       fs          = require('fs');
 
 // setup e-mail data with unicode symbols
 const mailOptions = {
-    from: `"Squashbot 👥" <${config.get('mailAccount')}>`, // sender address
+    from: "Squashbot 👥", // sender address
     subject: 'Bli med på squash? 🎾', // Subject line
     plaintext: ' ',
     logger: true //logs to stdout
@@ -18,7 +23,7 @@ const mailOptions = {
 
 function send(recipients, data) {
     return new Promise((resolve, reject) => {
-         fs.readFile(__dirname+'/mail.hbs', "utf-8", (err, template) => {
+         fs.readFile(path.resolve('../templates/mail.hbs'), "utf-8", (err, template) => {
              if(err) {
                 return reject(err);
              }else {
