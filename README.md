@@ -8,7 +8,6 @@
 ### Postgresql DB
 Install PostgreSQL. Connect to the default template database with a superuser, typically `postgres`.
 ```
-su - postgres
 psql -d template1 -U postgres
 ```
 Create a database and a user, and grant this user access.
