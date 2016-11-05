@@ -1,6 +1,7 @@
- version: '2'
- services:
-   itervent:
-     build: .
-     ports:
+version: '2'
+services:
+  itervent:
+    build: .
+    image: "itervent"
+    ports:
       - "9797:9797"
