@@ -95,7 +95,7 @@ let conf = convict({
         doc     : "Database connectionstring, URI formatted. postgres://[username]:[password]@[host]:[port]/[database]",
         format  : String,
         default : "postgresql://itervent:test@localhost:5432/itervent",
-        env     : "DATABASE_URL",
+        env     : "DATABSE_URL",
     },
 
     mailAccount: {
