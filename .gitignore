@@ -4,3 +4,4 @@ node_modules
 client/public
 .DS_Store
 elm-stuff
+yarn-error.log
