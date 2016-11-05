@@ -8,10 +8,10 @@ ADD . /usr/src/app
 WORKDIR /usr/src/app
 
 RUN apk add --update python curl tar && \
-    adduser -s /bin/ash -u 1000 -S $APPNAME && \
-    chown -R $APPNAME . && \
     curl -o- -L https://yarnpkg.com/install.sh | ash && \
     yarn && \
+    adduser -s /bin/ash -u 1000 -S $APPNAME && \
+    chown -R $APPNAME . && \
     apk --update del python make expat gdbm sqlite-libs libbz2 libffi g++ gcc curl tar && \
     rm -rf /var/cache/apk/*
 
