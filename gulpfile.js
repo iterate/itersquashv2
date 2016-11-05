@@ -2,19 +2,39 @@
 
 const   gulp
             = require('gulp'),
-        elm
-            = require('gulp-elm'),
         concatCss
             = require('gulp-concat-css'),
         nodemon
-            = require('gulp-nodemon');
+            = require('gulp-nodemon'),
+        gutil
+            = require('gulp-util'),
+        spawn
+            = require("child_process").spawn;
 
-gulp.task('elm-init', elm.init);
+gulp.task('elm-compile', function(done){
+      let child = spawn("elm-make", ["--output", "client/public/bundle.js", "client/src/elm/Main.elm"], {cwd: process.cwd()}),
+          stdout = '',
+          stderr = '';
 
-gulp.task('elm-compile', ['elm-init'], function(){
-  return gulp.src('client/src/elm/*.elm')
-    .pipe(elm.bundle('bundle.js'), {"yesToAllPrompts": true, "elmMake": true})
-    .pipe(gulp.dest('client/public/'));
+      child.stdout.setEncoding('utf8');
+      child.stderr.setEncoding('utf8');
+
+      child.stdout.on('data', function (data) {
+          stdout += data;
+          gutil.log(data);
+      });
+
+      child.stderr.on('data', function (data) {
+          stderr += data;
+          gutil.log(gutil.colors.red(data));
+          gutil.beep();
+      });
+
+      child.on('close', function(code) {
+          gutil.log("Done with exit code", code);
+           done();
+      });
+
 });
 
 gulp.task('html', function() {
@@ -28,9 +48,7 @@ gulp.task('css', function() {
     .pipe(gulp.dest('client/public/'));
 });
 
-gulp.task('compile', ['elm-init', 'elm-compile', 'css', 'html']);
-
-gulp.task('default', ['compile'], function () {
+gulp.task('default', ['elm-compile','css', 'html'], function () {
     return nodemon({
         script: 'app/bin/server.js',
         ext: 'js html css elm',

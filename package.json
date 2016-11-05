@@ -7,11 +7,10 @@
     "node": "6.2.1"
   },
   "scripts": {
-    "lint": "jshint --exclude ./node_modules,./client/public,./client/src",
-    "pretest": "npm run lint",
-    "test": "tap -R spec ./app/tests/*.js",
+    "lint": "jshint --exclude ./node_modules,./client",
+    "test": "tap -R spec app/tests/*.js",
     "dev-start": "gulp | bunyan",
-    "start": "gulp compile && node ./app/bin/server.js | bunyan"
+    "start": "node ./app/bin/server.js | bunyan"
   },
   "repository": {
     "type": "git",
@@ -24,15 +23,10 @@
   },
   "homepage": "https://github.com/iterate/itersquashv2#readme",
   "devDependencies": {
-    "gulp": "^3.9.1",
-    "gulp-concat-css": "^2.3.0",
-    "gulp-elm": "^0.5.0",
-    "gulp-nodemon": "^2.1.0",
-    "jshint": "2.9.2",
-    "nodemon": "1.10.0",
     "tap": "^7.1.2"
   },
   "dependencies": {
+    "bluebird": "^3.4.6",
     "body-parser": "^1.15.2",
     "browserify": "13.1.0",
     "bunyan": "1.8.1",
@@ -40,14 +34,20 @@
     "convict": "1.4.0",
     "cors": "2.7.1",
     "ejs": "2.5.1",
+    "elm": "0.17.1",
     "express": "4.14.0",
+    "gulp": "^3.9.1",
+    "gulp-concat-css": "^2.3.0",
+    "gulp-elm": "^0.5.0",
+    "gulp-nodemon": "^2.1.0",
     "handlebars": "4.0.5",
     "hbs": "4.0.0",
-    "mongodb": "2.2.7",
-    "mongoose": "^4.6.2",
+    "jshint": "2.9.2",
     "nodemailer": "2.5.0",
-    "path": "0.12.7",
-    "sw-precache": "4.0.0",
-    "url": "0.11.0"
+    "nodemon": "1.10.0",
+    "pg": "^6.1.0",
+    "pg-hstore": "^2.3.2",
+    "sequelize": "^3.24.3",
+    "sw-precache": "4.0.0"
   }
 }

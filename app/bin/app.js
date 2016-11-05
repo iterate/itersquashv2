@@ -21,9 +21,7 @@ const http
       config
         = require('../config/config'),
       db
-        = require('../storage/db'),
-      mongoose
-        = require('mongoose'),
+        = require('../storage'),
       fs
         = require('fs');
 
@@ -42,11 +40,6 @@ fs.readFile('./.art', "ASCII", function(err, data) {
 app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'html');
 app.set('views', path.resolve('client/public'));
-
-// Set up mongo database and connect mongoose to it
-db.open();
-mongoose.connect(config.get('db'));
-
 
 // Create service worker
 log.info('Compiling service worker script with pre-cached resources.');
