@@ -18,10 +18,6 @@ const http
         = express(),
       swPrecache
         = require('sw-precache'),
-      config
-        = require('../config/config'),
-      db
-        = require('../storage'),
       fs
         = require('fs');
 
