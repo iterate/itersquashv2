@@ -12,7 +12,11 @@ let fs
         = require('../lib/log');
 
 let db        = {},
-    sequelize = new Sequelize(config.get('dbURL'), {native: true, ssl:true});
+    sequelize = new Sequelize(config.get('dbURL'), {
+        dialect: 'postgres',
+        dialectOptions: {
+            ssl: true
+        }});
 
 //Test connection
 sequelize
