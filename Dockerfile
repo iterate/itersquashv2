@@ -9,9 +9,9 @@ WORKDIR /usr/src/app
 
 RUN apk add --update python curl tar && \
     adduser -s /bin/ash -u 1000 -S $APPNAME && \
-    chown -R $APPNAME . && \
     su -c "curl -o- -L https://yarnpkg.com/install.sh | ash" $APPNAME && \
     yarn && \
+    chown -R $APPNAME . && \
     apk --update del python make expat gdbm sqlite-libs libbz2 libffi g++ gcc curl tar && \
     rm -rf /var/cache/apk/*
 
