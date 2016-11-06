@@ -6,12 +6,12 @@
 
 module.exports = function(sequelize, DataTypes) {
 
-  var Entry = sequelize.define("Entry", {
+  var entry = sequelize.define("entry", {
     name: DataTypes.STRING
   }, {
     classMethods: {
       associate: function(models) {
-        Entry.belongsTo(models.Room, {
+        entry.belongsTo(models.room, {
           onDelete: "CASCADE",
           foreignKey: 'roomid'
         });
@@ -19,5 +19,5 @@ module.exports = function(sequelize, DataTypes) {
     }
   });
 
-  return Entry;
+  return entry;
 };
