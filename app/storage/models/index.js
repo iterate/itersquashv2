@@ -43,6 +43,7 @@ sequelize
         return null;
     });
 
+//Import models from same folder and expose on the db object
 fs
   .readdirSync(__dirname)
   .filter(function(file) {

@@ -1,5 +1,11 @@
 'use strict';
+
+/*
+    The base database migration file. Don't modify this, create a new one.
+*/
+
 module.exports = {
+  //Up defines the actions to upgrade the database
   up: function(queryInterface, Sequelize) {
     return queryInterface.createTable('rooms', {
         id: {
@@ -48,6 +54,7 @@ module.exports = {
         });
     });
   },
+  //Down defines the actions to rollback an upgrade
   down: function(queryInterface, Sequelize) {
     return queryInterface.dropTable('rooms') && queryInterface.dropTable('entries');
   }
