@@ -2,7 +2,7 @@ FROM mhart/alpine-node:base-6.9.1
 
 ENV PORT 9797
 ENV APPNAME app-itervent
-ENV PATH=${PATH}:/home/itervent/.yarn/bin
+ENV PATH=${PATH}:/home/$APPNAME/.yarn/bin
 
 ADD . /usr/src/app
 WORKDIR /usr/src/app
