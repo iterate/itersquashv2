@@ -13,8 +13,8 @@ const express
         = require('url'),
     mail
         = require('./mail.js'),
-    storage
-        = require('../storage'),
+    models
+        = require('../storage/models'),
     Promise
         = require('bluebird'),
     router
@@ -32,19 +32,14 @@ router.all('*', (req, res, next) => {
 //Client app endpoint
 
 router.get('/r/:title', (req, res, next) => {
-
-storage.Room
-    .sync()
-    .then(() => {
-        return storage.Room.findOrCreate({
-            include: [ storage.Entry ],
-            where: {
-                title: req.params.title
-            },
-            defaults: {
-                description: ""
-            }
-        });
+    models.room.findOrCreate({
+        include: [ models.entry ],
+        where: {
+            title: req.params.title
+        },
+        defaults: {
+            description: ""
+        }
     })
     .spread((roomDAO, created) => {
         return roomDAO.get({ plain: true});
@@ -63,26 +58,22 @@ storage.Room
 //This doesn't update existing ones yet
 
 router.put('/api/:title/entry', bodyParser.json(), (req, res, next) => {
-
-Promise.all([storage.Room.sync(), storage.Entry.sync()])
-    .spread((room, entry) => {
-        return room.findOne({
-            where: {
-                title: req.params.title
-            },
-            defaults: {
-                description: ""
-            }
+    models.room.findOne({
+        where: {
+            title: req.params.title
+        },
+        defaults: {
+            description: ""
+        }
+    })
+    .then((roomDAO) => {
+        //TODO: Handle no room
+        return models.entry.create({
+            name: req.body.name ? req.body.name : "Anonymous Andy",
+            roomid: roomDAO.dataValues.id
         })
-        .then((roomDAO) => {
-            //TODO: Handle no room
-            return entry.create({
-                name: req.body.name ? req.body.name : "Anonymous Andy",
-                roomid: roomDAO.dataValues.id
-            })
-            .then(() => {
-                return room;
-            });
+        .then(() => {
+            return roomDAO;
         });
     })
     .then((roomDAO) => {
@@ -100,30 +91,25 @@ Promise.all([storage.Room.sync(), storage.Entry.sync()])
 //Fetch room data endpoint
 
 router.get('/api/:title', (req, res, next) => {
+    models.room.findOrCreate({
+        include: [ models.entry ],
+        where: {
+            title: req.params.title
+        },
+        defaults: {
+            description: ""
+        }
+    })
+    .spread((room, created) => {
+        return room.get({ plain: true});
 
-    storage.Room
-        .sync()
-        .then(() => {
-            return storage.Room.findOrCreate({
-                include: [ storage.Entry ],
-                where: {
-                    title: req.params.title
-                },
-                defaults: {
-                    description: ""
-                }
-            });
-        })
-        .spread((room, created) => {
-            return room.get({ plain: true});
-
-        })
-        .then((room) => {
-            return res.status(200).json(room);
-        })
-        .catch((err) => {
-            next(err);
-        });
+    })
+    .then((room) => {
+        return res.status(200).json(room);
+    })
+    .catch((err) => {
+        next(err);
+    });
 });
 
 

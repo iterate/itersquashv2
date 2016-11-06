@@ -6,7 +6,7 @@
 
 module.exports = function(sequelize, DataTypes) {
 
-    var Room = sequelize.define('Room', {
+    var room = sequelize.define('room', {
         title: {
             type: DataTypes.STRING
         },
@@ -16,12 +16,12 @@ module.exports = function(sequelize, DataTypes) {
     }, {
         classMethods: {
           associate: function(models) {
-            Room.hasMany(models.Entry, {
+            room.hasMany(models.entry, {
               foreignKey: 'roomid'
           });
           }
         }
     });
 
-  return Room;
+  return room;
 };
