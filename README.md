@@ -5,8 +5,8 @@
 
 ## Setup
 
-### Postgresql DB
-Install PostgreSQL. Connect to the default template database with a superuser, typically `postgres`.
+### Database
+Install PostgreSQL. Connect to the default template database with a superuser i.e. `postgres`.
 ```
 psql -d template1 -U postgres
 ```
@@ -17,14 +17,19 @@ CREATE USER itervent WITH PASSWORD 'test';
 GRANT ALL PRIVILEGES ON DATABASE itervent to itervent;
 ```
 
-### Run with docker (optional)
+To create the initial tables, `npm install sequelize-cli` and run `node_modules/.bin/sequelize db:migrate --url postgresql://itervent:test@localhost:5432/itervent` from the `app/storage` folder. This will apply the migrations in `app/storage/migrations`.
+
+If you _change_ the data models, you need to create a migration to update the tables. Take a look at the pre-defined migrations, and
+the [Sequelize documentation ](http://docs.sequelizejs.com/en/v3/docs/migrations/)
+
+### Run with docker
 First [get docker compose](https://docs.docker.com/compose/install/).
 
 `docker-compose up`. Add `-d` to run in the background.
 
 ### Run with Node
 
-This project use the `[yarn](https://github.com/yarnpkg/yarn "Yarn")` package manager. Why? Ensuring consistent package behavior across environments. _Remember to commit the `yarn.lock` when you add or change modules_. Use `yarn` wherever you would use `npm`.
+This project use the `[yarn](https://github.com/yarnpkg/yarn "Yarn")` package manager. Use `yarn` wherever you would use `npm`, alternatively stick to `npm`, but remember to do a `docker build .` to confirm the project builds with yarn before merging changes.
 
  ```
  npm install -g yarn && yarn
