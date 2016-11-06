@@ -12,7 +12,7 @@ let fs
         = require('../lib/log');
 
 let db        = {},
-    sequelize = new Sequelize(config.get('dbURL'));
+    sequelize = new Sequelize(config.get('dbURL'), {native: true, ssl:true});
 
 //Test connection
 sequelize
