@@ -2,16 +2,13 @@
 
 ### Setup
 
-This project use the `[yarn](https://github.com/yarnpkg/yarn "Yarn")` package manager. Use `yarn` wherever you would use `npm`. _Remember to commit the `yarn.lock` when you add or change modules_.
+This project use the [yarn package manager](https://github.com/yarnpkg/yarn). Use `yarn` wherever you would use `npm`. Remember to commit the `yarn.lock` when you add or change modules.
 
  ```
  npm install -g yarn && yarn
  ```
 
 Run with `yarn start`, or `yarn run dev-start` for live reloading.
-
-### Docker build
-Do a test build before deployment. From project root: `docker build .`
 
 ### Postgresql DB
 Install PostgreSQL. Connect to the default template database with a superuser, typically `postgres`.
@@ -54,3 +51,15 @@ Example `development.json`:
 ## Health check
 
 Do a `GET /ping` and the app should return ok with app version i.e. `OK 0.0.1`.
+
+## Deployment
+
+[See wiki for details](https://iterate.atlassian.net/wiki/display/iter/app.iterate.no+-+Heroku+style+deployment)
+
+Add git remote:
+`git add remote iterate dokku@app.iterate.no:itervent`
+
+Push to deploy:
+`git push iterate master`
+
+Apply any new migrations manually after deploy.
