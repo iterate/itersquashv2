@@ -10,6 +10,7 @@
     "lint": "jshint --exclude ./node_modules,./client",
     "test": "tap -R spec app/tests/*.js",
     "dev-start": "gulp | bunyan",
+    "compile": "gulp compile",
     "start": "node ./app/bin/server.js | bunyan"
   },
   "repository": {

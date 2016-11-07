@@ -1,5 +1,6 @@
 npm-debug.log
 logfile
 node_modules
+client/public
 .DS_Store
 yarn-error.log

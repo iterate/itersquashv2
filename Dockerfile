@@ -1,4 +1,4 @@
-FROM mhart/alpine-node:base-6.9.1
+FROM node:6.3.1
 
 ENV PORT 9797
 ENV APPNAME app-itervent
@@ -7,16 +7,23 @@ ENV PATH=${PATH}:/home/$APPNAME/.yarn/bin
 ADD . /usr/src/app
 WORKDIR /usr/src/app
 
-RUN apk add --update python curl tar && \
-    adduser -s /bin/ash -u 1000 -S $APPNAME && \
-    su -c "curl -o- -L https://yarnpkg.com/install.sh | ash" $APPNAME && \
+RUN apt-get update && \
+    apt-get install \
+       ca-certificates \
+       gcc \
+       libc6-dev \
+       -qqy --force-yes \
+       --no-install-recommends \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN adduser --shell /bin/bash --uid 1000 --disabled-password --gecos "" $APPNAME && \
+    npm install -g yarn && \
     yarn && \
-    chown -R $APPNAME . && \
-    apk --update del python make expat gdbm sqlite-libs libbz2 libffi g++ gcc curl tar && \
-    rm -rf /var/cache/apk/*
+    yarn global add elm@0.17.1 && \
+    chown -R $APPNAME .
 
 USER $APPNAME
 
 EXPOSE $PORT
 
-CMD yarn start
+CMD yarn compile && yarn start
