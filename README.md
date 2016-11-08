@@ -1,5 +1,15 @@
 # Itervent
 
+### Usage
+
+`GET` `/r/pingpong` returns a shareable event url for the event `pingpong`.
+
+`GET` `/api/pingpong` returns data associated with `pingpong`.
+
+`PUT` `/api/pingpong/entry` add a new signup entry to the `pingpong` event.
+
+`GET` `/ping` health check - return ok with app version i.e. `OK 0.0.1`.
+
 ### Setup
 
 This project use the [yarn package manager](https://github.com/yarnpkg/yarn). Use `yarn` wherever you would use `npm`. Remember to commit the `yarn.lock` when you add or change modules.
@@ -48,9 +58,6 @@ Example `development.json`:
 }
 ```
 
-## Health check
-
-Do a `GET /ping` and the app should return ok with app version i.e. `OK 0.0.1`.
 
 ## Deployment
 
