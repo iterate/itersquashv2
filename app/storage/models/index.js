@@ -29,6 +29,8 @@ if (config.get('env') === 'production') {
     });
 }
 
+log.info("Testing database connection.. tic toc..");
+
 //Test connection
 sequelize
     .authenticate()
