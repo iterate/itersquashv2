@@ -1,15 +1,22 @@
 module Messages exposing (..)
 
+
 --CORE & COMMUNITY MODULES/PACKAGES
-import Http
+
+import Http exposing (..)
+
 
 --LOCAL MODULES
-import Models exposing (RoomModel, Entry)
+
+import Models exposing (RoomInfo, Entry)
 
 -- Define a few custom types for managing the state and data flows
-type Msg =
-    NoOp
+
+
+type Msg
+    = NoOp
     | Input String
     | Store
-    | SendFail Http.Error
-    | SendSuccess { entries: List Entry, title: String, description: String}
+    | FetchWoop RoomInfo
+    | FetchSuccess RoomInfo
+    | FetchFail 
