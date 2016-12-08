@@ -59,6 +59,7 @@ router.get('/r/:title', (req, res, next) => {
 
 router.put('/api/:title/entry', bodyParser.json(), (req, res, next) => {
     models.room.findOne({
+        include: [ models.entry ],
         where: {
             title: req.params.title
         },
