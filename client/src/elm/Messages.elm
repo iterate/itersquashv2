@@ -19,4 +19,5 @@ type Msg
     | Store
     | FetchWoop RoomInfo
     | FetchSuccess RoomInfo
-    | FetchFail 
+    | FetchFail
+    | StoreDescription

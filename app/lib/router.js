@@ -35,7 +35,7 @@ router.get('/r/:title', (req, res, next) => {
     models.room.findOrCreate({
         include: [ models.entry ],
         where: {
-            title: req.params.title
+            title: req.params.title.toLowerCase()
         },
         defaults: {
             description: ""
@@ -59,23 +59,30 @@ router.get('/r/:title', (req, res, next) => {
 
 router.put('/api/:title/entry', bodyParser.json(), (req, res, next) => {
     models.room.findOne({
-        include: [ models.entry ],
         where: {
-            title: req.params.title
-        },
-        defaults: {
-            description: ""
+            title: req.params.title.toLowerCase()
         }
     })
     .then((roomDAO) => {
-        //TODO: Handle no room
         return models.entry.create({
             name: req.body.name ? req.body.name : "Anonymous Andy",
             roomid: roomDAO.dataValues.id
         })
-        .then(() => {
+        .then((entry) => {
+            roomDAO.addEntry(entry);
             return roomDAO;
-        });
+        })
+    })
+    .then(() => {
+        return models.room.findOne({
+            include: [ models.entry ],
+            where: {
+                title: req.params.title.toLowerCase()
+            },
+            defaults: {
+                description: ""
+            }
+        })
     })
     .then((roomDAO) => {
         return roomDAO.get({ plain: true });
@@ -88,6 +95,30 @@ router.put('/api/:title/entry', bodyParser.json(), (req, res, next) => {
     });
 });
 
+//Update room description
+
+router.put('/api/:title/description', bodyParser.json(), (req, res, next) => {
+    models.room.findOne({
+        where: {
+            title: req.params.title.toLowerCase()
+        },
+        defaults: {
+            description: ""
+        }
+    })
+    .then((roomDAO) => {
+        return roomDAO.update({ description: req.body.description });
+    })
+    .then((roomDAO) => {
+        return roomDAO.get({ plain: true });
+    })
+    .then((room) => {
+        return res.status(200).json(room);
+    })
+    .catch((err) => {
+        next(err);
+    });
+});
 
 //Fetch room data endpoint
 
@@ -95,7 +126,7 @@ router.get('/api/:title', (req, res, next) => {
     models.room.findOrCreate({
         include: [ models.entry ],
         where: {
-            title: req.params.title
+            title: req.params.title.toLowerCase()
         },
         defaults: {
             description: ""

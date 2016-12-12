@@ -2,8 +2,8 @@ module Views.ListItem exposing (..)
 
 --CORE & COMMUNITY MODULES/PACKAGES
 
-import Html exposing (Html, div, text)
-
+import Html exposing (Html, div, text, li, span, i)
+import Html.Attributes exposing (class)
 
 --LOCAL MODULES
 
@@ -16,9 +16,16 @@ import Models as Entry exposing (Entry)
 
 listItem : Entry -> Html Msg
 listItem entry =
-    (div [] [ text (entry.name) ])
+    (li [ class "mdl-list__item" ]
+        [ span
+            [ class "mdl-list__item-primary-content" ]
+                [ i [ class "material-icons mdl-list__item-icon" ]
+                    [ text "person" ]
+                , text (entry.name) ]
+        ]
+    )
 
 
-listItems : List Entry -> List (Html Msg)
-listItems entries =
+listComp : List Entry -> List (Html Msg)
+listComp entries =
     (List.map listItem entries)

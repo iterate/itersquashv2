@@ -1,21 +1,11 @@
 <!DOCTYPE HTML>
 <html>
     <head>
-        <style>
-            body {
-                width: auto;
-            }
-            .todomvc-wrapper {
-                visibility: visible !important;
-            }
-        </style>
+        <script src="https://code.getmdl.io/1.2.1/material.min.js"></script>
+        <script async defer type="text/javascript" src="/sw.js"></script>
     </head>
     <body>
-        <div id="app"></div>
-
         <script type="text/javascript" src="/bundle.js"></script>
-
-        <script type="text/javascript" src="/sw.js"></script>
         <script>
             if ('serviceWorker' in navigator) {
               navigator.serviceWorker.register('/sw.js').then(function() {
@@ -39,6 +29,9 @@
         	}());
         </script>
 
+        <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <link rel="stylesheet" href="https://code.getmdl.io/1.2.1/material.blue_grey-indigo.min.css" />
         <link rel="stylesheet" href="/styles.css"/>
     </body>
 </html>

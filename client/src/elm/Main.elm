@@ -3,9 +3,9 @@ module Main exposing (..)
 --CORE & COMMUNITY MODULES/PACKAGES
 
 import Html
-import Html.Attributes exposing (placeholder, maxlength, type_, autofocus, id, class)
-import Html exposing (Html, button, div, text, input, h1, p)
-import Html.Events exposing (onClick, onInput, onSubmit)
+import Html.Attributes exposing (placeholder, maxlength, type_, autofocus, id, class, action, for)
+import Html exposing (Html, button, div, text, input, h1, p, form, label, i, ul)
+import Html.Events exposing (onClick, onInput, onSubmit, onWithOptions, Options)
 import Json.Encode exposing (encode, object, list, string)
 import Json.Decode
 import Http
@@ -17,7 +17,9 @@ import Task
 import Models exposing (RoomModel, Entry)
 import Messages exposing (..)
 import Decoders exposing (roomDecoder)
-import Views.ListItem exposing (listItems)
+import Views.ListItem exposing (listComp)
+import Views.Menu exposing (menuComp)
+import Views.Description exposing (descriptionComp)
 
 
 main =
@@ -74,8 +76,10 @@ update msg model =
             ( { model | entries = data.entries, title = data.title, description = data.description }, Cmd.none )
 
         FetchWoop data ->
-            ({ model | entries = data.entries, title = data.title, description = data.description }, getEntries data.title )
+            ( { model | entries = data.entries, title = data.title, description = data.description }, getEntries data.title )
 
+        StoreDescription ->
+            ( model, (updateDescription ("/api/" ++ model.title ++ "/description") model.description) )
 
 -- Fetch room data
 
@@ -94,9 +98,7 @@ getEntries title =
         (Http.get ("/api/" ++ title) roomDecoder)
 
 
-
--- Encode an entry and send to server
-
+-- Update entries
 
 postEntries : String -> String -> Cmd Msg
 postEntries url currentEntry =
@@ -125,8 +127,36 @@ postEntries url currentEntry =
             ) request
 
 
--- SUBSCRIPTIONS
+-- Update description
 
+updateDescription : String -> String -> Cmd Msg
+updateDescription url descriptionText =
+    let
+        data =
+            object [("description", string descriptionText)]
+        request =
+            Http.request
+                { method = "PUT"
+                , url = url
+                , headers = []
+                , body = Http.jsonBody data
+                , expect = Http.expectJson roomDecoder
+                , timeout = Nothing
+                , withCredentials = False
+                }
+    in
+        Http.send
+            (\result ->
+                case result of
+                    Ok data ->
+                        FetchSuccess data
+
+                    Err err ->
+                        FetchFail
+            ) request
+
+
+-- SUBSCRIPTIONS
 
 subscriptions : RoomModel -> Sub Msg
 subscriptions model =
@@ -140,25 +170,33 @@ subscriptions model =
 
 view : RoomModel -> Html Msg
 view model =
-    div [ id "wrapper" ]
-        [ div [ id "main" ]
-            [ div [ class "column" ]
-                [ div [ class "row" ]
-                    [ h1 [] [ text (model.title) ]
-                    ]
-                , div [ class "row" ]
-                    [ p [] [ text (model.description) ]
-                    ]
-                , div [ class "row" ]
-                    [ input [ type_ "text", maxlength 15, autofocus True, placeholder "Navn", onInput Input ] []
-                    , button [ onClick Store ] [ text ("Meld meg på") ]
-                    ]
-                , div [ class "row" ]
-                    [ div [ class "row" ]
-                        [ div [ class "entries" ]
-                            (listItems model.entries)
+    div [] [
+        menuComp
+        , div [ class "content" ]
+            [ div [ class "wrapper" ]
+                [ div [ class "column" ]
+                    [ div [ class "row title" ]
+                        [ div [ class "mdl-typography--display-3" ]
+                            [ text (model.title) ] ]
+                    , div [ class "row description" ]
+                        [ descriptionComp model.description ]
+                    , div [ class "row entry" ]
+                        [ form [ onWithOptions "submit" (Options True True)  (Json.Decode.succeed Store) ]
+                            [ div [ class "mdl-textfield mdl-js-textfield" ]
+                                [ input [ class "mdl-textfield__input", type_ "text", id "sample1", maxlength 15, autofocus True, onInput Input, onSubmit Store ] []
+                                  , label [ class "mdl-textfield__label", for "sample1" ] [ text "Navn" ]
+                                ]
+                            ]
+                            , button [ class "mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--colored", onClick Store ]
+                                [ i [ class "material-icons" ]
+                                    [ text "add" ]
+                                ]
+                        ]
+                    , div [ class "row" ]
+                        [ ul [ class "demo-list-item mdl-list" ]
+                            (listComp model.entries)
                         ]
                     ]
                 ]
             ]
-        ]
+    ]
