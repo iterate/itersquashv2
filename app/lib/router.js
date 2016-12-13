@@ -59,13 +59,19 @@ router.get('/r/:title', (req, res, next) => {
 
 router.put('/api/:title/entry', bodyParser.json(), (req, res, next) => {
     models.room.findOne({
+        include: [ models.entry ],
         where: {
             title: req.params.title.toLowerCase()
         }
     })
     .then((roomDAO) => {
+        const entries = roomDAO.dataValues.entries;
+        if(!req.body.name || entries.some((el) => el.name === req.body.name )) {
+            return roomDAO;
+        }
+
         return models.entry.create({
-            name: req.body.name ? req.body.name : "Anonymous Andy",
+            name: req.body.name,
             roomid: roomDAO.dataValues.id
         })
         .then((entry) => {
