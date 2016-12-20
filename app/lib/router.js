@@ -126,6 +126,29 @@ router.put('/api/:title/description', bodyParser.json(), (req, res, next) => {
     });
 });
 
+router.get('/api/:title/description', (req, res, next) => {
+    models.room.findOne({
+        where: {
+            title: req.params.title.toLowerCase()
+        },
+        defaults: {
+            description: ""
+        }
+    })
+    .then((roomDAO) => {
+        return roomDAO.update({ description: req.query.value });
+    })
+    .then((roomDAO) => {
+        return roomDAO.get({ plain: true });
+    })
+    .then((room) => {
+        return res.status(200).json(room);
+    })
+    .catch((err) => {
+        next(err);
+    });
+});
+
 //Fetch room data endpoint
 
 router.get('/api/:title', (req, res, next) => {
