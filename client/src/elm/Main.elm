@@ -162,7 +162,7 @@ subscriptions model =
 
 -- VIEWS
 
-menuComp : Html Msg
+-- menuComp : Html Msg
 menuComp =
     (
         div [ class "menu" ] [
@@ -176,10 +176,9 @@ menuComp =
         ]
     )
 
-mdlFor: String -> Attribute msg
-mdlFor value =
-    attribute "for" value
-
+-- mdlFor: String -> Attribute msg
+-- mdlFor value =
+--     attribute "for" value
 
 peopleList : List Entry -> List (Html Msg)
 peopleList entries =
@@ -214,8 +213,13 @@ view model =
                 [ div [ class "column" ]
                     [ div [ class "row description" ]
                         [ div [ class "description__textbox mdl-textfield mdl-js-textfield"]
-                            [ textarea [ id "markdownInput", class "description__text_input mdl-textfield__input", rows 10, name "markdownInput", style (hideShow model.editing), onInput StoreDescription ]
-                                [ text model.description ]
+                            [ textarea [  id "markdownInput"
+                                        , class "description__text_input mdl-textfield__input"
+                                        , rows 10
+                                        , name "markdownInput"
+                                        , style (hideShow model.editing)
+                                        , onInput StoreDescription
+                                        ] [ text model.description ]
                             , div [ class "description__text_output" , id "markdownOutput" ] [ ]
                             , i [ class "description__editbutton material-icons", onClick EditToggle ] [ text "mode_edit" ]
                             ]
@@ -223,19 +227,20 @@ view model =
                     , div [ class "row entry" ]
                         [ form [ ]
                             [ div [ class "entry_textfield mdl-textfield mdl-js-textfield" ]
-                                [ input [ class "mdl-textfield__input", type_ "text", id "entryField", maxlength 100, autofocus True, onInput Input, value ((\entry -> entry.name) model.currentEntry)] [ ]
+                                [ input [ class "mdl-textfield__input"
+                                        , type_ "text", id "entryField"
+                                        , maxlength 100
+                                        , autofocus True
+                                        , onInput Input
+                                        , value ((\entry -> entry.name) model.currentEntry)
+                                        ] [ ]
                                   , label [ class "mdl-textfield__label", for "entryField" ] [ text "Navn" ]
                                 ]
                             ]
-                            , button [ class "entry_button mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--colored", onClick Store ]
-                                [ i [ class "material-icons" ]
-                                    [ text "add" ]
-                                ]
+                            , button [ class "entry_button mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--colored"
+                                     , onClick Store ] [ i [ class "material-icons" ] [ text "add" ] ]
                         ]
-                    , div [ class "row entries" ]
-                        [ ul [ class "entries__list mdl-list" ]
-                            (peopleList model.entries)
-                        ]
+                    , div [ class "row entries" ] [ ul [ class "entries__list mdl-list" ] (peopleList model.entries) ]
                     ]
                 ]
             ]
