@@ -1,8 +1,12 @@
 <!DOCTYPE HTML>
 <html>
     <head>
-        <script src="https://code.getmdl.io/1.2.1/material.min.js"></script>
+        <script async defer src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.6/marked.min.js"></script>
+        <script async defer src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.6/marked.min.js.map"></script>
+        <script async defer src="https://code.getmdl.io/1.2.1/material.min.js"></script>
         <script async defer type="text/javascript" src="/sw.js"></script>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1">
     </head>
     <body>
         <script type="text/javascript" src="/bundle.js"></script>
@@ -16,7 +20,7 @@
 
         <script>
         	(function () {
-                var pathname = "Nothing to see here";
+                let pathname = "Nothing to see here";
                 if(window.location.pathname) {
                     try {
                         pathname = window.location.pathname.match(/([\wæøåÆØÅ]+$)/)[1];
@@ -25,7 +29,13 @@
                     }
                 }
 
-                Elm.Main.fullscreen({room: pathname});
+                const app = Elm.Main.fullscreen({room: pathname});
+
+                app.ports.parse.subscribe(text => {
+                    const placeholder = document.getElementById('markdownOutput');
+                    placeholder.innerHTML = marked(text);
+                });
+
         	}());
         </script>
 

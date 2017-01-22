@@ -2,25 +2,20 @@ module Main exposing (..)
 
 --CORE & COMMUNITY MODULES/PACKAGES
 
-import Html
-import Html.Attributes exposing (placeholder, maxlength, type_, autofocus, id, class, action, for)
-import Html exposing (Html, button, div, text, input, h1, p, form, label, i, ul)
+import Html.Attributes exposing (attribute, placeholder, maxlength, action, rows, type_, autofocus, id, class, action, for, contenteditable, style, name)
+import Html exposing (Html, Attribute, button, div, text, input, h1, p, form, label, i, ul, li, span, textarea)
 import Html.Events exposing (onClick, onInput, onSubmit, onWithOptions, Options)
 import Json.Encode exposing (encode, object, list, string)
 import Json.Decode
 import Http
 import Task
 
-
 --LOCAL MODULES
 
 import Models exposing (RoomModel, Entry)
 import Messages exposing (..)
 import Decoders exposing (roomDecoder)
-import Views.ListItem exposing (listComp)
-import Views.Menu exposing (menuComp)
-import Views.Description exposing (descriptionComp)
-
+import Markdown exposing (..)
 
 main =
     Html.programWithFlags
@@ -49,7 +44,7 @@ init flags =
         { room } =
             flags
     in
-        ( RoomModel [] room "This is a description" (Entry ""), getEntries room )
+        ( RoomModel [] room "This is a description" False (Entry ""), getEntries room )
 
 
 
@@ -64,7 +59,7 @@ update msg model =
             ( model, Cmd.none )
 
         Input name ->
-            ( RoomModel model.entries model.title model.description (Entry name), Cmd.none )
+            ( RoomModel model.entries model.title model.description model.editing (Entry name), Cmd.none )
 
         Store ->
             ( model, (postEntries ("/api/" ++ model.title ++ "/entry") ((\entry -> entry.name) model.currentEntry)) )
@@ -73,13 +68,16 @@ update msg model =
             ( model, Cmd.none )
 
         FetchSuccess data ->
-            ( { model | entries = data.entries, title = data.title, description = data.description }, Cmd.none )
+            ( { model | entries = data.entries, title = data.title, description = data.description }, Markdown.parse data.description)
 
         FetchWoop data ->
             ( { model | entries = data.entries, title = data.title, description = data.description }, getEntries data.title )
 
-        StoreDescription ->
-            ( model, (updateDescription ("/api/" ++ model.title ++ "/description") model.description) )
+        StoreDescription description ->
+            ( { model | description = description}, Cmd.batch([Markdown.parse description, (updateDescription ("/api/" ++ model.title ++ "/description") description)])  )
+
+        EditToggle ->
+            ( { model | editing = (not model.editing) }, Cmd.none )
 
 -- Fetch room data
 
@@ -162,11 +160,50 @@ subscriptions : RoomModel -> Sub Msg
 subscriptions model =
     Sub.none
 
+-- VIEWS
+
+menuComp : Html Msg
+menuComp =
+    (
+        div [ class "menu" ] [
+            -- div [ class "buttonwrapper" ] [
+            --     button [ id "menubutton", class "mdl-button mdl-js-button mdl-button--icon" ] [
+            --         i [ class "material-icons" ] [ text "more_vert" ]
+            --     ]
+            --     , ul [ class "mdl-menu mdl-js-menu mdl-menu--bottom-right mdl-js-ripple-effect", mdlFor "menubutton"]
+            --         [ li [ class "mdl-menu__item" ] [ text "Github" ] ]
+            -- ]
+        ]
+    )
+
+mdlFor: String -> Attribute msg
+mdlFor value =
+    attribute "for" value
 
 
--- VIEW
---The main view
+peopleList : List Entry -> List (Html Msg)
+peopleList entries =
+    let
+        listItem entry =
+            (li [ class "entries__item mdl-list__item" ]
+            [ span
+                [ class "mdl-list__item-primary-content" ]
+                    [ i [ class "material-icons mdl-list__item-icon" ]
+                        [ text "person" ]
+                    , text (entry.name) ]
+            ]
+        )
+    in
+        (List.map listItem entries)
 
+hideShow: Bool -> List (String, String)
+hideShow editmode =
+    case editmode of
+        True ->
+            [("display", "block")]
+
+        False ->
+            [("display", "none")]
 
 view : RoomModel -> Html Msg
 view model =
@@ -175,16 +212,19 @@ view model =
         , div [ class "content" ]
             [ div [ class "wrapper" ]
                 [ div [ class "column" ]
-                    [ div [ class "row title" ]
-                        [ div [ class "mdl-typography--display-3" ]
-                            [ text (model.title) ] ]
-                    , div [ class "row description" ]
-                        [ descriptionComp model.description ]
+                    [ div [ class "row description" ]
+                        [ div [ class "description__textbox mdl-textfield mdl-js-textfield"]
+                            [ textarea [ id "markdownInput", class "description__text_input mdl-textfield__input", rows 10, name "markdownInput", style (hideShow model.editing), onInput StoreDescription ]
+                                [ text model.description ]
+                            , div [ class "description__text_output" , id "markdownOutput" ] [ ]
+                            , i [ class "description__editbutton material-icons", onClick EditToggle ] [ text "mode_edit" ]
+                            ]
+                        ]
                     , div [ class "row entry" ]
                         [ form [ onWithOptions "submit" (Options True True)  (Json.Decode.succeed Store) ]
                             [ div [ class "mdl-textfield mdl-js-textfield" ]
-                                [ input [ class "mdl-textfield__input", type_ "text", id "sample1", maxlength 15, autofocus True, onInput Input, onSubmit Store ] []
-                                  , label [ class "mdl-textfield__label", for "sample1" ] [ text "Navn" ]
+                                [ input [ class "mdl-textfield__input", type_ "text", id "entryField", maxlength 100, autofocus True, onInput Input, onSubmit Store ] []
+                                  , label [ class "mdl-textfield__label", for "entryField" ] [ text "Navn" ]
                                 ]
                             ]
                             , button [ class "mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--colored", onClick Store ]
@@ -192,9 +232,9 @@ view model =
                                     [ text "add" ]
                                 ]
                         ]
-                    , div [ class "row" ]
-                        [ ul [ class "demo-list-item mdl-list" ]
-                            (listComp model.entries)
+                    , div [ class "row entries" ]
+                        [ ul [ class "entries__list mdl-list" ]
+                            (peopleList model.entries)
                         ]
                     ]
                 ]

@@ -1,10 +1,8 @@
 module Messages exposing (..)
 
-
 --CORE & COMMUNITY MODULES/PACKAGES
 
 import Http exposing (..)
-
 
 --LOCAL MODULES
 
@@ -20,4 +18,5 @@ type Msg
     | FetchWoop RoomInfo
     | FetchSuccess RoomInfo
     | FetchFail
-    | StoreDescription
+    | StoreDescription String
+    | EditToggle
