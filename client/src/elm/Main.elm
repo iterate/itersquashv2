@@ -2,7 +2,7 @@ module Main exposing (..)
 
 --CORE & COMMUNITY MODULES/PACKAGES
 
-import Html.Attributes exposing (attribute, placeholder, maxlength, action, rows, type_, autofocus, id, class, action, for, contenteditable, style, name)
+import Html.Attributes exposing (attribute, placeholder, maxlength, action, rows, type_, autofocus, id, class, action, for, contenteditable, style, name, value)
 import Html exposing (Html, Attribute, button, div, text, input, h1, p, form, label, i, ul, li, span, textarea)
 import Html.Events exposing (onClick, onInput, onSubmit, onWithOptions, Options)
 import Json.Encode exposing (encode, object, list, string)
@@ -62,7 +62,7 @@ update msg model =
             ( RoomModel model.entries model.title model.description model.editing (Entry name), Cmd.none )
 
         Store ->
-            ( model, (postEntries ("/api/" ++ model.title ++ "/entry") ((\entry -> entry.name) model.currentEntry)) )
+            ( { model | currentEntry = (Entry "")}, (postEntries ("/api/" ++ model.title ++ "/entry") ((\entry -> entry.name) model.currentEntry)) )
 
         FetchFail ->
             ( model, Cmd.none )
@@ -221,9 +221,9 @@ view model =
                             ]
                         ]
                     , div [ class "row entry" ]
-                        [ form [ onWithOptions "submit" (Options True True)  (Json.Decode.succeed Store) ]
+                        [ form [ ]
                             [ div [ class "entry_textfield mdl-textfield mdl-js-textfield" ]
-                                [ input [ class "mdl-textfield__input", type_ "text", id "entryField", maxlength 100, autofocus True, onInput Input, onSubmit Store ] []
+                                [ input [ class "mdl-textfield__input", type_ "text", id "entryField", maxlength 100, autofocus True, onInput Input, value ((\entry -> entry.name) model.currentEntry)] [ ]
                                   , label [ class "mdl-textfield__label", for "entryField" ] [ text "Navn" ]
                                 ]
                             ]
