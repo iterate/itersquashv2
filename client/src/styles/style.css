@@ -36,6 +36,10 @@ body {
     justify-content: space-between;
 }
 
+.entry_textfield {
+    padding-right: 10px;
+}
+
 .entries__list, .description__textbox, .entry_textfield, .entry_button {
     margin: 0;
     padding: 0;
@@ -118,6 +122,10 @@ textarea[name="markdownInput"] {
 
     .description__text_input {
         padding-top: 16px;
+    }
+
+    .entry_textfield {
+        padding-right: 16px;
     }
 
     .entries__item {
