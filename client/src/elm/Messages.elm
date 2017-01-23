@@ -1,14 +1,12 @@
 module Messages exposing (..)
 
-
 --CORE & COMMUNITY MODULES/PACKAGES
 
 import Http exposing (..)
 
-
 --LOCAL MODULES
 
-import Models exposing (RoomInfo, Entry)
+import Models exposing (RoomInfo)
 
 -- Define a few custom types for managing the state and data flows
 
@@ -16,8 +14,8 @@ import Models exposing (RoomInfo, Entry)
 type Msg
     = NoOp
     | Input String
-    | Store
-    | FetchWoop RoomInfo
+    | StoreEntry
     | FetchSuccess RoomInfo
     | FetchFail
-    | StoreDescription
+    | StoreDescription String
+    | EditToggle

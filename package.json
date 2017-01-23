@@ -44,6 +44,7 @@
     "handlebars": "4.0.6",
     "hbs": "4.0.1",
     "jshint": "2.9.4",
+    "marked": "0.3.6",
     "nodemailer": "2.6.4",
     "nodemon": "1.11.0",
     "pg": "^6.1.0",

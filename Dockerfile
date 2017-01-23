@@ -11,6 +11,7 @@ RUN apt-get update && \
     apt-get install \
        ca-certificates \
        gcc \
+       vim-tiny \
        libc6-dev \
        -qqy --force-yes \
        --no-install-recommends \
