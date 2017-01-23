@@ -29,7 +29,7 @@
                     }
                 }
 
-                const app = Elm.Main.fullscreen({room: pathname});
+                const app = Elm.Main.fullscreen({ title: pathname});
 
                 app.ports.parse.subscribe(text => {
                     const placeholder = document.getElementById('markdownOutput');

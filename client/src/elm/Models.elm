@@ -2,11 +2,14 @@ module Models exposing (..)
 
 -- MODEL
 
-type alias Entry =
-    { name : String }
-
 type alias RoomModel =
-    { entries : List Entry, title : String, description : String, editing : Bool, currentEntry : Entry }
+    { entries : List String
+    , title : String
+    , description : String
+    , editing : Bool
+    , currentEntry : String }
 
 type alias RoomInfo =
-    { entries : List Entry, title : String, description : String }
+    { entries : List String
+    , title : String
+    , description : String }

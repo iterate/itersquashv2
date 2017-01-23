@@ -12,7 +12,7 @@ import Task
 
 --LOCAL MODULES
 
-import Models exposing (RoomModel, Entry)
+import Models exposing (RoomModel)
 import Messages exposing (..)
 import Decoders exposing (roomDecoder)
 import Markdown exposing (..)
@@ -29,9 +29,8 @@ main =
 
 -- For "safety" we create a type alias for application input from the page
 
-
 type alias Flags =
-    { room : String }
+    { title : String }
 
 
 
@@ -40,11 +39,7 @@ type alias Flags =
 
 init : Flags -> ( RoomModel, Cmd Msg )
 init flags =
-    let
-        { room } =
-            flags
-    in
-        ( RoomModel [] room "This is a description" False (Entry ""), getEntries room )
+    ( { entries = [], title = flags.title, description = "# " ++ flags.title, editing = False, currentEntry = "" }, getEntries flags.title )
 
 
 
@@ -59,10 +54,10 @@ update msg model =
             ( model, Cmd.none )
 
         Input name ->
-            ( RoomModel model.entries model.title model.description model.editing (Entry name), Cmd.none )
+            { model | currentEntry = name} ! []
 
-        Store ->
-            ( { model | currentEntry = (Entry "")}, (postEntries ("/api/" ++ model.title ++ "/entry") ((\entry -> entry.name) model.currentEntry)) )
+        StoreEntry ->
+            ( { model | currentEntry = "" }, postEntry model.title model.currentEntry )
 
         FetchFail ->
             ( model, Cmd.none )
@@ -70,17 +65,14 @@ update msg model =
         FetchSuccess data ->
             ( { model | entries = data.entries, title = data.title, description = data.description }, Markdown.parse data.description)
 
-        FetchWoop data ->
-            ( { model | entries = data.entries, title = data.title, description = data.description }, getEntries data.title )
-
         StoreDescription description ->
-            ( { model | description = description}, Cmd.batch([Markdown.parse description, (updateDescription ("/api/" ++ model.title ++ "/description") description)])  )
+            { model | description = description}
+            ! [Markdown.parse description, (updateDescription ("/api/" ++ model.title ++ "/description") description)]
 
         EditToggle ->
-            ( { model | editing = (not model.editing) }, Cmd.none )
+            { model | editing = (not model.editing) } ! []
 
 -- Fetch room data
-
 
 getEntries : String -> Cmd Msg
 getEntries title =
@@ -98,15 +90,15 @@ getEntries title =
 
 -- Update entries
 
-postEntries : String -> String -> Cmd Msg
-postEntries url currentEntry =
+postEntry : String -> String -> Cmd Msg
+postEntry title currentEntry =
     let
         data =
             object [("name", string currentEntry)]
         request =
             Http.request
                 { method = "PUT"
-                , url = url
+                , url = ("/api/" ++ title ++ "/entry")
                 , headers = []
                 , body = Http.jsonBody data
                 , expect = Http.expectJson roomDecoder
@@ -162,7 +154,7 @@ subscriptions model =
 
 -- VIEWS
 
--- menuComp : Html Msg
+menuComp : Html Msg
 menuComp =
     (
         div [ class "menu" ] [
@@ -180,7 +172,7 @@ menuComp =
 -- mdlFor value =
 --     attribute "for" value
 
-peopleList : List Entry -> List (Html Msg)
+peopleList : List String -> List (Html Msg)
 peopleList entries =
     let
         listItem entry =
@@ -189,7 +181,7 @@ peopleList entries =
                 [ class "mdl-list__item-primary-content" ]
                     [ i [ class "material-icons mdl-list__item-icon" ]
                         [ text "person" ]
-                    , text (entry.name) ]
+                    , text (entry) ]
             ]
         )
     in
@@ -232,13 +224,13 @@ view model =
                                         , maxlength 100
                                         , autofocus True
                                         , onInput Input
-                                        , value ((\entry -> entry.name) model.currentEntry)
+                                        , value model.currentEntry
                                         ] [ ]
                                   , label [ class "mdl-textfield__label", for "entryField" ] [ text "Navn" ]
                                 ]
                             ]
                             , button [ class "entry_button mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--colored"
-                                     , onClick Store ] [ i [ class "material-icons" ] [ text "add" ] ]
+                                     , onClick StoreEntry ] [ i [ class "material-icons" ] [ text "add" ] ]
                         ]
                     , div [ class "row entries" ] [ ul [ class "entries__list mdl-list" ] (peopleList model.entries) ]
                     ]
