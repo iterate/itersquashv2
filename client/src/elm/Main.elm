@@ -4,9 +4,9 @@ module Main exposing (..)
 
 import Html.Attributes exposing (attribute, placeholder, maxlength, action, rows, type_, autofocus, id, class, action, for, contenteditable, style, name, value)
 import Html exposing (Html, Attribute, button, div, text, input, h1, p, form, label, i, ul, li, span, textarea)
-import Html.Events exposing (onClick, onInput, onSubmit, onWithOptions, Options)
-import Json.Encode exposing (encode, object, list, string)
-import Json.Decode
+import Html.Events exposing (onClick, onInput, on, keyCode)
+import Json.Encode exposing (object, list, string)
+import Json.Decode exposing (andThen, succeed, fail)
 import Http
 import Task
 
