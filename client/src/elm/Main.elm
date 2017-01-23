@@ -196,6 +196,17 @@ hideShow editmode =
         False ->
             [("display", "none")]
 
+onEnter : Msg -> Attribute Msg
+onEnter msg =
+    let
+        isEnter code =
+            if code == 13 then
+                succeed msg
+            else
+                succeed NoOp
+    in
+        on "keydown" (Json.Decode.andThen isEnter keyCode)
+
 view : RoomModel -> Html Msg
 view model =
     div [] [
@@ -224,6 +235,7 @@ view model =
                                         , maxlength 100
                                         , autofocus True
                                         , onInput Input
+                                        , onEnter StoreEntry
                                         , value model.currentEntry
                                         ] [ ]
                                   , label [ class "mdl-textfield__label", for "entryField" ] [ text "Navn" ]
