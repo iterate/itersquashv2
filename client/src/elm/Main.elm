@@ -217,14 +217,16 @@ view model =
                     [ div [ class "row description" ]
                         [ div [ class "description__textbox mdl-textfield mdl-js-textfield"]
                             [ textarea [  id "markdownInput"
-                                        , class "description__text_input mdl-textfield__input"
+                                        , class "description__input mdl-textfield__input"
                                         , rows 10
                                         , name "markdownInput"
                                         , style (hideShow model.editing)
                                         , onInput StoreDescription
                                         ] [ text model.description ]
-                            , div [ class "description__text_output" , id "markdownOutput" ] [ ]
-                            , i [ class "description__editbutton material-icons", onClick EditToggle ] [ text "mode_edit" ]
+                            , div [ class "description__output" , id "markdownOutput" ] [ ]
+                            , div [ class "description__editwrapper"]
+                                [ i [ class "description__editbutton material-icons", onClick EditToggle ]
+                                    [ text "mode_edit" ] ]
                             ]
                         ]
                     , div [ class "row entry" ]
