@@ -2,25 +2,20 @@ module Main exposing (..)
 
 --CORE & COMMUNITY MODULES/PACKAGES
 
-import Html
-import Html.Attributes exposing (placeholder, maxlength, type_, autofocus, id, class, action, for)
-import Html exposing (Html, button, div, text, input, h1, p, form, label, i, ul)
-import Html.Events exposing (onClick, onInput, onSubmit, onWithOptions, Options)
-import Json.Encode exposing (encode, object, list, string)
-import Json.Decode
+import Html.Attributes exposing (attribute, placeholder, maxlength, action, rows, type_, autofocus, id, class, action, for, contenteditable, style, name, value)
+import Html exposing (Html, Attribute, button, div, text, input, h1, p, form, label, i, ul, li, span, textarea)
+import Html.Events exposing (onClick, onInput, on, keyCode)
+import Json.Encode exposing (object, list, string)
+import Json.Decode exposing (andThen, succeed, fail)
 import Http
 import Task
 
-
 --LOCAL MODULES
 
-import Models exposing (RoomModel, Entry)
+import Models exposing (RoomModel)
 import Messages exposing (..)
 import Decoders exposing (roomDecoder)
-import Views.ListItem exposing (listComp)
-import Views.Menu exposing (menuComp)
-import Views.Description exposing (descriptionComp)
-
+import Markdown exposing (..)
 
 main =
     Html.programWithFlags
@@ -34,9 +29,8 @@ main =
 
 -- For "safety" we create a type alias for application input from the page
 
-
 type alias Flags =
-    { room : String }
+    { title : String }
 
 
 
@@ -45,11 +39,7 @@ type alias Flags =
 
 init : Flags -> ( RoomModel, Cmd Msg )
 init flags =
-    let
-        { room } =
-            flags
-    in
-        ( RoomModel [] room "This is a description" (Entry ""), getEntries room )
+    ( { entries = [], title = flags.title, description = "# " ++ flags.title, editing = False, currentEntry = "" }, getEntries flags.title )
 
 
 
@@ -64,25 +54,25 @@ update msg model =
             ( model, Cmd.none )
 
         Input name ->
-            ( RoomModel model.entries model.title model.description (Entry name), Cmd.none )
+            { model | currentEntry = name} ! []
 
-        Store ->
-            ( model, (postEntries ("/api/" ++ model.title ++ "/entry") ((\entry -> entry.name) model.currentEntry)) )
+        StoreEntry ->
+            ( { model | currentEntry = "" }, postEntry model.title model.currentEntry )
 
         FetchFail ->
             ( model, Cmd.none )
 
         FetchSuccess data ->
-            ( { model | entries = data.entries, title = data.title, description = data.description }, Cmd.none )
+            ( { model | entries = data.entries, title = data.title, description = data.description }, Markdown.parse data.description)
 
-        FetchWoop data ->
-            ( { model | entries = data.entries, title = data.title, description = data.description }, getEntries data.title )
+        StoreDescription description ->
+            { model | description = description}
+            ! [Markdown.parse description, (updateDescription ("/api/" ++ model.title ++ "/description") description)]
 
-        StoreDescription ->
-            ( model, (updateDescription ("/api/" ++ model.title ++ "/description") model.description) )
+        EditToggle ->
+            { model | editing = (not model.editing) } ! []
 
 -- Fetch room data
-
 
 getEntries : String -> Cmd Msg
 getEntries title =
@@ -100,15 +90,15 @@ getEntries title =
 
 -- Update entries
 
-postEntries : String -> String -> Cmd Msg
-postEntries url currentEntry =
+postEntry : String -> String -> Cmd Msg
+postEntry title currentEntry =
     let
         data =
             object [("name", string currentEntry)]
         request =
             Http.request
                 { method = "PUT"
-                , url = url
+                , url = ("/api/" ++ title ++ "/entry")
                 , headers = []
                 , body = Http.jsonBody data
                 , expect = Http.expectJson roomDecoder
@@ -162,11 +152,60 @@ subscriptions : RoomModel -> Sub Msg
 subscriptions model =
     Sub.none
 
+-- VIEWS
 
+menuComp : Html Msg
+menuComp =
+    (
+        div [ class "menu" ] [
+            -- div [ class "buttonwrapper" ] [
+            --     button [ id "menubutton", class "mdl-button mdl-js-button mdl-button--icon" ] [
+            --         i [ class "material-icons" ] [ text "more_vert" ]
+            --     ]
+            --     , ul [ class "mdl-menu mdl-js-menu mdl-menu--bottom-right mdl-js-ripple-effect", mdlFor "menubutton"]
+            --         [ li [ class "mdl-menu__item" ] [ text "Github" ] ]
+            -- ]
+        ]
+    )
 
--- VIEW
---The main view
+-- mdlFor: String -> Attribute msg
+-- mdlFor value =
+--     attribute "for" value
 
+peopleList : List String -> List (Html Msg)
+peopleList entries =
+    let
+        listItem entry =
+            (li [ class "entries__item mdl-list__item" ]
+            [ span
+                [ class "mdl-list__item-primary-content" ]
+                    [ i [ class "material-icons mdl-list__item-icon" ]
+                        [ text "person" ]
+                    , text (entry) ]
+            ]
+        )
+    in
+        (List.map listItem entries)
+
+hideShow: Bool -> List (String, String)
+hideShow editmode =
+    case editmode of
+        True ->
+            [("display", "block")]
+
+        False ->
+            [("display", "none")]
+
+onEnter : Msg -> Attribute Msg
+onEnter msg =
+    let
+        isEnter code =
+            if code == 13 then
+                succeed msg
+            else
+                succeed NoOp
+    in
+        on "keydown" (Json.Decode.andThen isEnter keyCode)
 
 view : RoomModel -> Html Msg
 view model =
@@ -175,27 +214,37 @@ view model =
         , div [ class "content" ]
             [ div [ class "wrapper" ]
                 [ div [ class "column" ]
-                    [ div [ class "row title" ]
-                        [ div [ class "mdl-typography--display-3" ]
-                            [ text (model.title) ] ]
-                    , div [ class "row description" ]
-                        [ descriptionComp model.description ]
+                    [ div [ class "row description" ]
+                        [ div [ class "description__textbox mdl-textfield mdl-js-textfield"]
+                            [ textarea [  id "markdownInput"
+                                        , class "description__text_input mdl-textfield__input"
+                                        , rows 10
+                                        , name "markdownInput"
+                                        , style (hideShow model.editing)
+                                        , onInput StoreDescription
+                                        ] [ text model.description ]
+                            , div [ class "description__text_output" , id "markdownOutput" ] [ ]
+                            , i [ class "description__editbutton material-icons", onClick EditToggle ] [ text "mode_edit" ]
+                            ]
+                        ]
                     , div [ class "row entry" ]
-                        [ form [ onWithOptions "submit" (Options True True)  (Json.Decode.succeed Store) ]
-                            [ div [ class "mdl-textfield mdl-js-textfield" ]
-                                [ input [ class "mdl-textfield__input", type_ "text", id "sample1", maxlength 15, autofocus True, onInput Input, onSubmit Store ] []
-                                  , label [ class "mdl-textfield__label", for "sample1" ] [ text "Navn" ]
+                        [ form [ ]
+                            [ div [ class "entry_textfield mdl-textfield mdl-js-textfield" ]
+                                [ input [ class "mdl-textfield__input"
+                                        , type_ "text", id "entryField"
+                                        , maxlength 100
+                                        , autofocus True
+                                        , onInput Input
+                                        , onEnter StoreEntry
+                                        , value model.currentEntry
+                                        ] [ ]
+                                  , label [ class "mdl-textfield__label", for "entryField" ] [ text "Navn" ]
                                 ]
                             ]
-                            , button [ class "mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--colored", onClick Store ]
-                                [ i [ class "material-icons" ]
-                                    [ text "add" ]
-                                ]
+                            , button [ class "entry_button mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--colored"
+                                     , onClick StoreEntry ] [ i [ class "material-icons" ] [ text "add" ] ]
                         ]
-                    , div [ class "row" ]
-                        [ ul [ class "demo-list-item mdl-list" ]
-                            (listComp model.entries)
-                        ]
+                    , div [ class "row entries" ] [ ul [ class "entries__list mdl-list" ] (peopleList model.entries) ]
                     ]
                 ]
             ]
