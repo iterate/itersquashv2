@@ -19,8 +19,19 @@ body {
     width: 100%;
 }
 
-.description__text_output {
+.description__output {
     min-height: 100px;
+}
+
+/* Prevent markdown images and stuff overflowing the container*/
+.description__output * {
+    max-width: 100%;
+}
+
+.description__editwrapper {
+    display: block;
+    height: 24px;
+    position: relative;
 }
 
 .description__editbutton {
@@ -99,7 +110,7 @@ textarea[name="markdownInput"] {
     margin-bottom: 10px;
 }
 
-.description__text_input {
+.description__input {
     padding-top: 10px;
 }
 
@@ -120,7 +131,7 @@ textarea[name="markdownInput"] {
         right: 16px;
     }
 
-    .description__text_input {
+    .description__input {
         padding-top: 16px;
     }
 
