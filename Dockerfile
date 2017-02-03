@@ -10,6 +10,7 @@ WORKDIR /usr/src/app
 RUN apt-get update && \
     apt-get install \
        ca-certificates \
+       vim-tiny \
        gcc \
        libc6-dev \
        -qqy --force-yes \
