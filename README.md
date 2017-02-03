@@ -1,4 +1,4 @@
-# [Itervent](https://itervent.app.iterate.no)
+# [Itervent](https://event.app.iterate.no)
 
 ### Usage
 
@@ -11,7 +11,6 @@
 `GET` `/ping` health check - return ok with app version i.e. `OK 0.0.1`.
 
 ### Setup
-
 
 This project use the [yarn package manager](https://github.com/yarnpkg/yarn). Use `yarn` wherever you would use `npm`. Remember to commit the `yarn.lock` when you add or change modules.
 
@@ -28,14 +27,14 @@ psql -d template1 -U postgres
 ```
 Create a database and a user, and grant this user access.
 ```
-CREATE DATABASE itervent;
-CREATE USER itervent WITH PASSWORD 'test';
-GRANT ALL PRIVILEGES ON DATABASE itervent to itervent;
+CREATE DATABASE event;
+CREATE USER event WITH PASSWORD 'test';
+GRANT ALL PRIVILEGES ON DATABASE event to event;
 ```
 The first time you also need to run migrations to create the tables.
 Sequelize-cli is installed as a node package, so from the `app/storage` folder, do
 ```
-../../node_modules/.bin/sequelize db:migrate --url postgresql://itervent:test@localhost:5432/itervent
+../../node_modules/.bin/sequelize db:migrate --url postgresql://event:test@localhost:5432/event
 ```
 This will apply the migrations from `app/storage/migrations`.
 
@@ -65,7 +64,7 @@ Example `development.json`:
 [See wiki for details](https://iterate.atlassian.net/wiki/display/iter/app.iterate.no+-+Heroku+style+deployment)
 
 Add git remote:
-`git add remote iterate dokku@app.iterate.no:itervent`
+`git add remote iterate dokku@app.iterate.no:event`
 
 Push to deploy:
 `git push iterate master`
