@@ -182,7 +182,7 @@ router.get('/ping', (req, res) => {
 
 // Static files
 
-router.use(express.static(config.get('docRoot')));
+router.use('/assets', express.static(config.get('docRoot')));
 
 // Export application
 
