@@ -75,10 +75,8 @@ body {
 }
 
 .row {
-    padding: 0 10px 0 10px;
-}
-.row.entry {
-    padding-top: 10px;
+    background-color: #FFF;
+    padding: 10px 10px 10px 10px;
 }
 
 textarea[name="markdownInput"] {
@@ -102,10 +100,6 @@ textarea[name="markdownInput"] {
     flex-grow: 1;
 }
 
-.row {
-    background-color: #FFF;
-}
-
 .row.description {
     margin-bottom: 10px;
 }
@@ -120,11 +114,7 @@ textarea[name="markdownInput"] {
     }
 
     .row {
-        padding: 0 16px 0 16px;
-    }
-
-    .row.entry {
-        padding-top: 16px;
+        padding: 16px 16px 16px 16px;
     }
 
     .description__editbutton {
