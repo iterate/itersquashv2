@@ -31,7 +31,7 @@ router.all('*', (req, res, next) => {
 
 //Client app endpoint
 
-router.get('/r/:title', (req, res, next) => {
+router.get('/:title', (req, res, next) => {
     models.room.findOrCreate({
         include: [ models.entry ],
         where: {
