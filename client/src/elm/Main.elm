@@ -39,7 +39,7 @@ type alias Flags =
 
 init : Flags -> ( RoomModel, Cmd Msg )
 init flags =
-    ( { entries = [], title = flags.title, description = "# " ++ flags.title, editing = False, currentEntry = "" }, getEntries flags.title )
+    ( { entries = Just [], title = flags.title, description = "# " ++ flags.title, editing = False, currentEntry = "" }, getEntries flags.title )
 
 
 
@@ -63,7 +63,7 @@ update msg model =
             ( model, Cmd.none )
 
         FetchSuccess data ->
-            ( { model | entries = data.entries, title = data.title, description = data.description }, Markdown.parse data.description)
+            ( { model | entries = Just data.entries, title = data.title, description = data.description }, Markdown.parse data.description)
 
         StoreDescription description ->
             { model | description = description}
@@ -172,20 +172,25 @@ menuComp =
 -- mdlFor value =
 --     attribute "for" value
 
-peopleList : List String -> List (Html Msg)
-peopleList entries =
-    let
-        listItem entry =
-            (li [ class "entries__item mdl-list__item" ]
-            [ span
-                [ class "mdl-list__item-primary-content" ]
-                    [ i [ class "material-icons mdl-list__item-icon" ]
-                        [ text "person" ]
-                    , text (entry) ]
-            ]
-        )
-    in
-        (List.map listItem entries)
+entryList : Maybe (List String) -> Html Msg
+entryList entries =
+    case entries of
+        Nothing ->
+            (div [][])
+
+        Just entries ->
+        (let
+            listItem entry =
+                (li [ class "entries__item mdl-list__item" ]
+                [ span
+                    [ class "mdl-list__item-primary-content" ]
+                        [ i [ class "material-icons mdl-list__item-icon" ]
+                            [ text "person" ]
+                        , text (entry) ]
+                ]
+            )
+        in
+            div [ class "row entries" ] [ ul [ class "entries__list mdl-list" ] (List.map listItem entries) ])
 
 hideShow: Bool -> List (String, String)
 hideShow editmode =
@@ -246,7 +251,7 @@ view model =
                             , button [ class "entry_button mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--colored"
                                      , onClick StoreEntry ] [ i [ class "material-icons" ] [ text "add" ] ]
                         ]
-                    , div [ class "row entries" ] [ ul [ class "entries__list mdl-list" ] (peopleList model.entries) ]
+                    , (entryList model.entries)
                     ]
                 ]
             ]

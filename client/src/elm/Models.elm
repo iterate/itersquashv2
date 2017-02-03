@@ -3,7 +3,7 @@ module Models exposing (..)
 -- MODEL
 
 type alias RoomModel =
-    { entries : List String
+    { entries : Maybe (List String)
     , title : String
     , description : String
     , editing : Bool
