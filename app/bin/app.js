@@ -24,11 +24,11 @@ const http
 
 
 //ASCII Art
-fs.readFile('./.art', "ASCII", function(err, data) {
-    if(!err) {
-        log.info(data);
-    }
-});
+// fs.readFile('./.art', "ASCII", function(err, data) {
+//     if(!err) {
+//         log.info(data);
+//     }
+// });
 
 
 // Set up handlebars as template engine

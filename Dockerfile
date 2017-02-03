@@ -1,7 +1,7 @@
 FROM node:6.3.1
 
 ENV PORT 9797
-ENV APPNAME app-itervent
+ENV APPNAME app-event
 ENV PATH=${PATH}:/home/$APPNAME/.yarn/bin
 
 ADD . /usr/src/app
@@ -11,7 +11,6 @@ RUN apt-get update && \
     apt-get install \
        ca-certificates \
        gcc \
-       vim-tiny \
        libc6-dev \
        -qqy --force-yes \
        --no-install-recommends \

@@ -27,7 +27,7 @@ let conf = convict({
     name: {
         doc     : "Name of the application",
         format  : String,
-        default : "itersquash"
+        default : "event"
     },
 
     serverType: {
@@ -94,7 +94,7 @@ let conf = convict({
     dbURL: {
         doc     : "Database connectionstring, URI formatted. postgres://[username]:[password]@[host]:[port]/[database]",
         format  : String,
-        default : "postgresql://itervent:test@localhost:5432/itervent",
+        default : "postgresql://event:test@localhost:5432/event",
         env     : "DATABSE_URL",
     },
 

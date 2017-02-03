@@ -1,7 +1,7 @@
 {
-  "name": "itersquash",
+  "name": "event",
   "version": "0.0.2",
-  "description": "Iterate squash app",
+  "description": "Iterate event app",
   "main": "./app/bin/server.js",
   "engines": {
     "node": "6.2.1"
@@ -15,14 +15,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/iterate/itersquashv2.git"
+    "url": "git+https://github.com/iterate/itervent.git"
   },
   "author": "Magnus Lien",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/iterate/itersquashv2/issues"
+    "url": "https://github.com/iterate/itervent/issues"
   },
-  "homepage": "https://github.com/iterate/itersquashv2#readme",
+  "homepage": "https://github.com/iterate/itervent#readme",
   "devDependencies": {
     "tap": "^8.0.1"
   },
