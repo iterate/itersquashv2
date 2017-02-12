@@ -1,0 +1,47 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <script async defer src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.6/marked.min.js"></script>
+        <script async defer src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.6/marked.min.js.map"></script>
+        <script async defer src="https://code.getmdl.io/1.2.1/material.min.js"></script>
+        <script async defer type="text/javascript" src="/assets/sw.js"></script>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+        <script type="text/javascript" src="/assets/bundle.js"></script>
+        <script>
+            if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.register('/assets/sw.js').then(function() {
+                console.log("Service Worker Registered");
+              });
+            }
+        </script>
+
+        <script>
+        	(function () {
+                let pathname = "Nothing to see here";
+                if(window.location.pathname) {
+                    try {
+                        pathname = window.location.pathname.match(/([\wæøåÆØÅ]+$)/)[1];
+                    }catch(err){
+                        console.log("URL path error: %s", err);
+                    }
+                }
+
+                const app = Elm.Main.fullscreen({ title: pathname});
+
+                app.ports.parse.subscribe(text => {
+                    const placeholder = document.getElementById('markdownOutput');
+                    placeholder.innerHTML = marked(text);
+                });
+
+        	}());
+        </script>
+
+        <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <link rel="stylesheet" href="https://code.getmdl.io/1.2.1/material.blue_grey-indigo.min.css" />
+        <link rel="stylesheet" href="/assets/styles.css"/>
+    </body>
+</html>

@@ -1,0 +1,144 @@
+* {
+  /*Prevents padding from affecting box width/height*/
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #E8E8E7;
+  min-width: 300px;
+}
+
+.description {
+  width: 100%;
+}
+
+.description__textbox {
+  min-height: 100px;
+  width: 100%;
+}
+
+.description__output {
+  min-height: 100px;
+}
+
+/* Prevent markdown images and stuff overflowing the container*/
+
+.description__output * {
+  max-width: 100%;
+}
+
+.description__editwrapper {
+  display: block;
+  height: 24px;
+  position: relative;
+}
+
+.description__editbutton {
+  bottom: 10px;
+  cursor: pointer;
+  position: absolute;
+  right: 10px;
+}
+
+.entry {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.entry_textfield {
+  padding-right: 10px;
+}
+
+.entries__list,
+.description__textbox,
+.entry_textfield,
+.entry_button {
+  margin: 0;
+  padding: 0;
+}
+
+.entries__item {
+  padding: 10px 0 10px 0;
+}
+
+.menu {
+  background: #1fbcd2;
+  box-shadow: 0 0 1px 1px rgba(92,83,75,.6);
+  color: #fff;
+  height: 56px;
+  line-height: 56px;
+  top: 0;
+  width: 100%;
+}
+
+.menu,
+.wrapper {
+  margin-bottom: 10px;
+}
+
+.row {
+  background-color: #FFF;
+  padding: 10px 10px 10px 10px;
+}
+
+textarea[name="markdownInput"] {
+  resize: none;
+}
+
+.content .wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.content .wrapper .column {
+  flex-grow: 1;
+  font-family: Planer-Regular,Helvetica Neue,Helvetica;
+  max-width: 700px;
+}
+
+.content .entry > form {
+  flex-grow: 1;
+}
+
+.row.description {
+  margin-bottom: 10px;
+}
+
+.description__input {
+  padding-top: 10px;
+}
+
+@media (min-width: 1025px) {
+  .menu,
+  .wrapper {
+    margin-bottom: 32px;
+  }
+
+  .row {
+    padding: 16px 16px 16px 16px;
+  }
+
+  .description__editbutton {
+    right: 16px;
+  }
+
+  .description__input {
+    padding-top: 16px;
+  }
+
+  .entry_textfield {
+    padding-right: 16px;
+  }
+
+  .entries__item {
+    padding: 16px 0 16px 0;
+  }
+
+  .row.description {
+    margin-bottom: 16px;
+  }
+}
