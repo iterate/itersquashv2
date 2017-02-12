@@ -1,6 +1,6 @@
 version: '2'
 services:
-  itervent:
+  event:
     build: .
     image: "event"
     ports:
