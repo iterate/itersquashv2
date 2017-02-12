@@ -14,7 +14,6 @@ RUN apk add --update python curl tar gnupg && \
 
 ADD package.json /usr/src/app
 RUN yarn
-
 ADD . /usr/src/app
 RUN chown -R $APPNAME .
 
