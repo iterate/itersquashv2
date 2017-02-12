@@ -1,14 +1,11 @@
 # [Itervent](https://event.app.iterate.no)
 
 ### Usage
+`event.app.iterate.no/eventName`
 
-`GET` `/r/pingpong` returns a shareable event url for the event `pingpong`.
+## API
 
-`GET` `/api/pingpong` returns data associated with `pingpong`.
-
-`PUT` `/api/pingpong/entry` add a new signup entry to the `pingpong` event.
-
-`GET` `/ping` health check - return ok with app version i.e. `OK 0.0.1`.
+Take a look at [the router](https://github.com/iterate/itervent/blob/master/app/lib/router.js).
 
 ### Setup
 
