@@ -1,18 +1,11 @@
 'use strict';
 
-let fs
-        = require("fs"),
-    path
-        = require("path"),
-    config
-        = require('../../config/config'),
-    Sequelize
-        = require("sequelize"),
-    log
-        = require('../../lib/log'),
-    basename
-        = path.basename(module.filename);
-
+const fs        = require("fs");
+const path      = require("path");
+const config    = require('../../config/config');
+const Sequelize = require("sequelize");
+const log       = require('../../lib/log');
+const basename  = path.basename(module.filename);
 
 let db = {}, sequelize;
 
@@ -29,9 +22,9 @@ if (config.get('env') === 'production') {
     });
 }
 
-log.info("Testing database connection.. tic toc..");
-
 //Test connection
+log.info("Testing database connection - tic toc..");
+
 sequelize
     .authenticate()
     .then(() => {

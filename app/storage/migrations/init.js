@@ -1,19 +1,19 @@
 'use strict';
 
 /*
-    The base database migration file. Don't modify this, create a new one.
+    The base database migration file. Don't modify this, create a new one. 
+    Migrations are executed in sorted order, so prefix filename with a number in increasing value.
 */
 
 module.exports = {
   //Up defines the actions to upgrade the database
   up: function(queryInterface, Sequelize) {
-    return queryInterface.createTable('rooms', {
+    return queryInterface.createTable('events', {
         id: {
-          allowNull: false,
-          autoIncrement: true,
-          primaryKey: true,
-          type: Sequelize.INTEGER
-        },
+            type: Sequelize.INTEGER,
+            primaryKey: true,
+            autoIncrement: true
+          },
         title: {
           type: Sequelize.STRING
         },
@@ -29,13 +29,12 @@ module.exports = {
           type: Sequelize.DATE
         }
     }).then(function () {
-        return queryInterface.createTable('entries', {
+        return queryInterface.createTable('participants', {
             id: {
-                allowNull: false,
-                autoIncrement: true,
+                type: Sequelize.INTEGER,
                 primaryKey: true,
-                type: Sequelize.INTEGER
-            },
+                autoIncrement: true
+              },
             name: {
                 type: Sequelize.STRING
             },
@@ -43,19 +42,24 @@ module.exports = {
                 allowNull: false,
                 type: Sequelize.DATE
             },
+            cancelled: {
+                type: Sequelize.BOOLEAN,
+                allowNull: false,
+                defaultValue: false
+            },
             updatedAt: {
                 allowNull: false,
                 type: Sequelize.DATE
             },
-            roomid: {
+            eventid: {
                  type: Sequelize.INTEGER,
-                 references: { model: 'rooms', key: 'id' }
+                 references: { model: 'events', key: 'id' }
             }
         });
     });
   },
   //Down defines the actions to rollback an upgrade
   down: function(queryInterface, Sequelize) {
-    return queryInterface.dropTable('rooms') && queryInterface.dropTable('entries');
+    return queryInterface.dropTable('events') && queryInterface.dropTable('participants');
   }
 };
