@@ -28,37 +28,29 @@ fs.readFile('./.art', "ASCII", function(err, data) {
 */
 
 log.info('Making service worker script with pre-cached resources.');
-swPrecache.write(path.resolve('client/public') +'/sw.js',
-{
-  staticFileGlobs: [path.resolve('client/public/assets') + '/**/*.{js,css,png,jpg,gif,svg,eot,ttf,woff}'],
-  stripPrefix: [path.resolve('client/public')],
+swPrecache.write(`${path.resolve('client/public')}/sw.js`, {
+  staticFileGlobs: [ `${path.resolve('client/public/assets')}/**/*.{js,css,png,jpg,gif,svg,eot,ttf,woff}` ],
+  stripPrefix: [ path.resolve('client/public') ],
   verbose: true,
-  runtimeCaching : [
-  {
+  runtimeCaching : [{
       urlPattern: /marked/,
       handler: 'cacheFirst'
-  },
-  {
+  },{
     urlPattern: /assets\//,
     handler: 'cacheFirst'
-  },
-  {
+  },{
     urlPattern: /api\//,
     handler: 'networkFirst'
-  },
-  {
+  },{
     urlPattern: /fonts\.googleapis\.com/,
     handler: 'cacheFirst'
-  },
-  {
+  },{
     urlPattern: /fonts\.gstatic\.com/,
     handler: 'cacheFirst'
-  },
-  {
+  },{
     urlPattern: /code\.getmdl\.io/,
     handler: 'cacheFirst'
-  }
-]
+  }]
 });
 
 
@@ -95,7 +87,9 @@ app.use((error, req, res, next) => {
 
 app.use((error, req, res, next) => {
     /* jshint unused: false */
-    res.status(500).send({error: "Internal server error"});
+    res
+      .status(500)
+      .send({ error: 'Internal server error' });
 });
 
 
