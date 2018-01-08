@@ -1,89 +1,87 @@
 "use strict";
 
-const http
-        = require('http'),
-      path
-        = require('path'),
-      express
-        = require('express'),
-      compress
-        = require('compression')(),
-      cors
-        = require('cors'),
-      log
-        = require('../lib/log.js'),
-      router
-        = require('../lib/router.js'),
-      app
-        = express(),
-      swPrecache
-        = require('sw-precache'),
-      fs
-        = require('fs');
+const http        = require('http');
+const path        = require('path');
+const express     = require('express');
+const compress    = require('compression')();
+const cors        = require('cors');
+const log         = require('../lib/log.js');
+const router      = require('../lib/router.js');
+const app         = express();
+const swPrecache  = require('sw-precache');
+const fs          = require('fs');
 
 
+/*
+* Art
+*/
 
-//ASCII Art
-// fs.readFile('./.art', "ASCII", function(err, data) {
-//     if(!err) {
-//         log.info(data);
-//     }
-// });
+fs.readFile('./.art', "ASCII", function(err, data) {
+    if(!err) {
+        log.info(data);
+    }
+});
 
 
-// Set up handlebars as template engine
+/*
+* Compile service worker
+*/
 
-app.engine('html', require('ejs').renderFile);
-app.set('view engine', 'html');
-app.set('views', path.resolve('client/public'));
-
-// Create service worker
-log.info('Compiling service worker script with pre-cached resources.');
+log.info('Making service worker script with pre-cached resources.');
 swPrecache.write(path.resolve('client/public') +'/sw.js',
 {
-  staticFileGlobs: [path.resolve('client/public') + '/**/*.{js,css,png,jpg,gif,svg,eot,ttf,woff}'],
+  staticFileGlobs: [path.resolve('client/public/assets') + '/**/*.{js,css,png,jpg,gif,svg,eot,ttf,woff}'],
   stripPrefix: [path.resolve('client/public')],
   verbose: true,
-  runtimeCaching : [{
-      urlPattern: '/bundle\.js/',
+  runtimeCaching : [
+  {
+      urlPattern: /marked/,
       handler: 'cacheFirst'
   },
   {
-      urlPattern: '/\.css/',
-      handler: 'cacheFirst'
+    urlPattern: /assets\//,
+    handler: 'cacheFirst'
   },
   {
-      urlPattern: '/r/*',
-      handler: 'cacheFirst'
+    urlPattern: /api\//,
+    handler: 'networkFirst'
   },
   {
-      urlPattern: '/api/*',
-      handler: 'networkFirst'
+    urlPattern: /fonts\.googleapis\.com/,
+    handler: 'cacheFirst'
+  },
+  {
+    urlPattern: /fonts\.gstatic\.com/,
+    handler: 'cacheFirst'
+  },
+  {
+    urlPattern: /code\.getmdl\.io/,
+    handler: 'cacheFirst'
   }
 ]
 });
 
 
-// Configure application
+/*
+* App config
+*/
 
 app.disable('x-powered-by');
 app.enable('trust proxy');
-
-
-
-// Set middleware
-
 app.use(compress);
 app.use(cors());
 
 
-
-// Attach lib routers
+/*
+*  Routes
+*/
 
 app.use('/', router);
 
 
-// Log errors
+/*
+* Error logging
+*/
 
 app.use((error, req, res, next) => {
     log.error(error);
@@ -91,18 +89,14 @@ app.use((error, req, res, next) => {
 });
 
 
-
-// Catch all requests which fall through the
-// middleware chain, not matching any routes,
-// and serve a 500 page
+/*
+* Serve 500 error page for requests that does not match any middleware or routes
+*/
 
 app.use((error, req, res, next) => {
     /* jshint unused: false */
     res.status(500).send({error: "Internal server error"});
 });
 
-
-
-// Set up http server and Export application
 
 module.exports = http.createServer(app);
