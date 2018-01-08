@@ -2,17 +2,23 @@ module Decoders exposing (..)
 
 --CORE & COMMUNITY MODULES/PACKAGES
 
-import Json.Decode exposing (Decoder, string, list, map3, map, field)
+import Json.Decode exposing (Decoder, string, int, list, decodeString, map4, list, map, map3, maybe, field)
 
 --LOCAL MODULES
 
-import Models exposing (RoomInfo)
+import Models exposing (ServerData, Participant)
 
 -- Decodes room JSON objects
 
-roomDecoder : Decoder RoomInfo
-roomDecoder =
-    map3 RoomInfo
-        (field "entries" (list (field "name" string) ))
-        (field "title" string)
-        (field "description" string)
+entryDecoder : Decoder (List Participant)
+entryDecoder =
+    list personDecoder
+
+descriptionDecoder : Decoder String
+descriptionDecoder =
+    string
+
+personDecoder : Decoder Participant
+personDecoder = 
+    map3 (\id name createdAt -> Participant False id name createdAt "") (field "id" int) (field "name" string) (field "createdAt" string)
+    

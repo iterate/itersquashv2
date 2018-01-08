@@ -2,20 +2,27 @@ module Messages exposing (..)
 
 --CORE & COMMUNITY MODULES/PACKAGES
 
-import Http exposing (..)
 
 --LOCAL MODULES
 
-import Models exposing (RoomInfo)
+import Models exposing (ServerData, Participant)
 
 -- Define a few custom types for managing the state and data flows
 
 
 type Msg
     = NoOp
-    | Input String
-    | StoreEntry
-    | FetchSuccess RoomInfo
+    | NewParticipant String
+    | PutParticipant
     | FetchFail
-    | StoreDescription String
-    | EditToggle
+    | UpdateParticipant Participant
+    | EditParticipant Participant String
+    | EditParticipantToggle Participant
+    | PutParticipantSuccess (List Participant)
+    | GetParticipantSuccess (List Participant)
+    | PutDescription
+    | EditDescription String
+    | GetDescriptionSuccess String
+    | EditDescriptionToggle
+    | ParsedTime (List Participant)
+    | DeleteParticipant Participant

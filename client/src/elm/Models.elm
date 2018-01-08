@@ -2,14 +2,25 @@ module Models exposing (..)
 
 -- MODEL
 
-type alias RoomModel =
-    { entries : Maybe (List String)
+type alias EventModel =
+    { participants : Maybe (List Participant)
     , title : String
     , description : String
+    , parsedDescription: String 
     , editing : Bool
-    , currentEntry : String }
+    , id: Int
+    , newParticipant: Participant }
 
-type alias RoomInfo =
-    { entries : List String
+type alias ServerData =
+    { participants : List Participant
     , title : String
-    , description : String }
+    , description : String
+    , id : String }
+
+type alias Participant = {
+      edit : Bool
+    , id   : Int
+    , name : String
+    , createdAt : String
+    , createdAtTimeSince : String
+}

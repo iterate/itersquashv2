@@ -2,21 +2,22 @@ module Main exposing (..)
 
 --CORE & COMMUNITY MODULES/PACKAGES
 
-import Html.Attributes exposing (attribute, placeholder, maxlength, action, rows, type_, autofocus, id, class, action, for, contenteditable, style, name, value)
-import Html exposing (Html, Attribute, button, div, text, input, h1, p, form, label, i, ul, li, span, textarea)
-import Html.Events exposing (onClick, onInput, on, keyCode)
+import Html.Attributes exposing (attribute, placeholder, maxlength, tabindex, action, rows, type_, autofocus, readonly, id, class, action, for, contenteditable, style, name, value)
+import Html exposing (Html, Attribute, button, div, text, img, a, input, h1, p, form, label, i, ul, li, span, textarea)
+import Html.Events exposing (onClick, onInput, onBlur, on, onWithOptions, onSubmit, defaultOptions, keyCode, targetValue)
 import Json.Encode exposing (object, list, string)
-import Json.Decode exposing (andThen, succeed, fail)
+import Json.Decode exposing (succeed, fail, andThen)
 import Http
-import Task
 
 --LOCAL MODULES
 
-import Models exposing (RoomModel)
+import Models exposing (EventModel, Participant)
 import Messages exposing (..)
-import Decoders exposing (roomDecoder)
-import Markdown exposing (..)
+import Decoders exposing (entryDecoder, descriptionDecoder)
+import Markdown
+import Ports exposing (..)
 
+main : Program Flags EventModel Msg
 main =
     Html.programWithFlags
         { init = init
@@ -25,21 +26,23 @@ main =
         , subscriptions = subscriptions
         }
 
-
-
 -- For "safety" we create a type alias for application input from the page
 
 type alias Flags =
-    { title : String }
-
-
+    { title : String, id : Int }
 
 --Initialize model/application state
 
 
-init : Flags -> ( RoomModel, Cmd Msg )
+init : Flags -> ( EventModel, Cmd Msg )
 init flags =
-    ( { entries = Just [], title = flags.title, description = "# " ++ flags.title, editing = False, currentEntry = "" }, getEntries flags.title )
+        { participants = Just []
+        , title = flags.title
+        , description = ""
+        , parsedDescription = ""
+        , editing = False
+        , id = flags.id
+        , newParticipant = (Participant False -1 "" "" "") } ! [getDescription flags.id, getParticipants flags.id]
 
 
 
@@ -47,61 +50,135 @@ init flags =
 -- Updates application model/state
 
 
-update : Msg -> RoomModel -> ( RoomModel, Cmd Msg )
+update : Msg -> EventModel -> ( EventModel, Cmd Msg )
 update msg model =
     case msg of
         NoOp ->
             ( model, Cmd.none )
 
-        Input name ->
-            { model | currentEntry = name} ! []
+        NewParticipant name ->
+            { model | newParticipant = Participant False -1 name "" ""} ! []
 
-        StoreEntry ->
-            ( { model | currentEntry = "" }, postEntry model.title model.currentEntry )
+        PutParticipant ->
+            { model | newParticipant = Participant False -1 "" "" ""} ! [ putParticipant model.id model.newParticipant ]
+
+        UpdateParticipant participant ->
+            ( model, updateParticipant model.id participant.id participant.name)
 
         FetchFail ->
             ( model, Cmd.none )
 
-        FetchSuccess data ->
-            ( { model | entries = Just data.entries, title = data.title, description = data.description }, Markdown.parse data.description)
+        PutParticipantSuccess participants ->
+            ( { model | participants = Just participants }, Ports.parseTime participants)
 
-        StoreDescription description ->
-            { model | description = description}
-            ! [Markdown.parse description, (updateDescription ("/api/" ++ model.title ++ "/description") description)]
+        GetParticipantSuccess participants ->
+            ( { model | participants = Just participants }, Ports.parseTime participants)
+                    
+        GetDescriptionSuccess description ->
+            { model | description = description } ! []
 
-        EditToggle ->
+        PutDescription ->
+            { model | editing = False } ! [ putDescription model.id model.description ]
+        
+        EditDescription description ->
+            ({ model | description = description }, Cmd.none)
+
+        EditDescriptionToggle ->
             { model | editing = (not model.editing) } ! []
+            
+        EditParticipantToggle participant -> 
+            let
+                participants = model.participants
+            in   
+                (case participants of
+                    Nothing ->
+                        (model, Cmd.none)
 
--- Fetch room data
+                    Just participants ->
+                        { model | participants = Just(toggleEditParticipant participant participants) } ! [])
+        
+        EditParticipant participant name ->
+            let
+                participants = model.participants
+            in   
+                (case participants of
+                    Nothing ->
+                        (model, Cmd.none)
 
-getEntries : String -> Cmd Msg
-getEntries title =
+                    Just participants ->
+                        { model | participants = Just(editParticipant participant name participants) } ! [])
+        
+        ParsedTime participants ->
+            { model | participants = Just(participants) } ! []
+
+        DeleteParticipant participant ->
+            ( model, deleteParticipant model.id participant.id )
+                        
+
+-- Edit a participant
+
+editParticipant : Participant -> String -> List Participant -> List Participant
+editParticipant participant name participants =
+    (List.map (\e -> if(e==participant) then ({ e | name = name }) else (e)) participants)
+
+-- Toggle a participant for editing
+
+toggleEditParticipant : Participant -> List Participant -> List Participant
+toggleEditParticipant participant participants =
+    (List.map (\e -> if(e==participant) then (if (e.edit == True) then ({ e | edit = False }) else ({ e | edit = True })) else ({ e | edit = False })) participants)
+
+-- Set time since createdAt
+
+-- setTimeSince : Participant -> List Participant -> String -> List Participant
+-- setTimeSince participant participants time =
+--     (List.map (\e -> if (e==participant) then ({ participant | createdAtTimeSince = time }) else participant) participants)
+
+
+-- Fetch description data
+
+getDescription : Int -> Cmd Msg
+getDescription id =
     Http.send
         (\result ->
             case result of
                 Ok data ->
-                    FetchSuccess data
+                    GetDescriptionSuccess data
 
                 Err err ->
                     FetchFail
         )
-        (Http.get ("/api/" ++ title) roomDecoder)
+        (Http.get ("/api/" ++ toString id ++ "/description") descriptionDecoder)
+
+-- Fetch participants data
+
+getParticipants : Int -> Cmd Msg
+getParticipants id =
+    Http.send
+        (\result ->
+            case result of
+                Ok data ->
+                    GetParticipantSuccess data
+
+                Err err ->
+                    FetchFail
+        )
+        (Http.get ("/api/" ++ toString id ++ "/participants") entryDecoder)
 
 
--- Update entries
+-- Store a new participant
 
-postEntry : String -> String -> Cmd Msg
-postEntry title currentEntry =
+putParticipant : Int -> Participant -> Cmd Msg
+putParticipant id participant =
     let
         data =
-            object [("name", string currentEntry)]
+            object [("name", string participant.name)]
         request =
             Http.request
                 { method = "PUT"
-                , url = ("/api/" ++ title ++ "/entry")
+                , url = ("/api/" ++ toString id ++ "/participants")
                 , headers = []
                 , body = Http.jsonBody data
-                , expect = Http.expectJson roomDecoder
+                , expect = Http.expectJson entryDecoder
                 , timeout = Nothing
                 , withCredentials = False
                 }
@@ -110,27 +187,78 @@ postEntry title currentEntry =
             (\result ->
                 case result of
                     Ok data ->
-                        FetchSuccess data
+                        PutParticipantSuccess data
 
                     Err err ->
                         FetchFail
             ) request
 
+deleteParticipant : Int -> Int -> Cmd Msg
+deleteParticipant modelId participantId =
+    let
+        request =
+            Http.request
+                { method = "DELETE"
+                , url = ("/api/" ++ toString modelId ++ "/participants/" ++ toString participantId)
+                , headers = []
+                , body = Http.emptyBody
+                , expect = Http.expectJson entryDecoder
+                , timeout = Nothing
+                , withCredentials = False
+                }
+    in
+        Http.send
+            (\result ->
+                case result of
+                    Ok data ->
+                        PutParticipantSuccess data
+
+                    Err err ->
+                        FetchFail
+            ) request
+
+-- Update a participant
+
+updateParticipant : Int -> Int -> String -> Cmd Msg
+updateParticipant modelId participantId name =
+    let
+        data =
+            object [("name", string name)]
+        request =
+            Http.request
+                { method = "PUT"
+                , url = ("/api/" ++ toString modelId ++ "/participants/" ++ toString participantId)
+                , headers = []
+                , body = Http.jsonBody data
+                , expect = Http.expectJson entryDecoder
+                , timeout = Nothing
+                , withCredentials = False
+                }
+    in
+        Http.send
+            (\result ->
+                case result of
+                    Ok data ->
+                        PutParticipantSuccess data
+
+                    Err err ->
+                        FetchFail
+            ) request
 
 -- Update description
-
-updateDescription : String -> String -> Cmd Msg
-updateDescription url descriptionText =
+-- TODO: Proper REST
+putDescription : Int -> String -> Cmd Msg
+putDescription id descriptionText =
     let
         data =
             object [("description", string descriptionText)]
         request =
             Http.request
                 { method = "PUT"
-                , url = url
+                , url = ("/api/" ++ toString id ++ "/description")
                 , headers = []
                 , body = Http.jsonBody data
-                , expect = Http.expectJson roomDecoder
+                , expect = Http.expectJson descriptionDecoder
                 , timeout = Nothing
                 , withCredentials = False
                 }
@@ -139,67 +267,28 @@ updateDescription url descriptionText =
             (\result ->
                 case result of
                     Ok data ->
-                        FetchSuccess data
+                        GetDescriptionSuccess data
 
                     Err err ->
                         FetchFail
             ) request
 
+parseMarkdown : String -> Html Msg
+parseMarkdown description =
+    let
+        default = Markdown.defaultOptions
+        markdownOptions = { default | githubFlavored = Just { tables = True, breaks = True }, sanitize = True }
+    in
+        Markdown.toHtmlWith markdownOptions [ class "description-output" ] description
+
 
 -- SUBSCRIPTIONS
 
-subscriptions : RoomModel -> Sub Msg
+subscriptions : EventModel -> Sub Msg
 subscriptions model =
-    Sub.none
+    Ports.parsedTime ParsedTime
 
--- VIEWS
-
-menuComp : Html Msg
-menuComp =
-    (
-        div [ class "menu" ] [
-            -- div [ class "buttonwrapper" ] [
-            --     button [ id "menubutton", class "mdl-button mdl-js-button mdl-button--icon" ] [
-            --         i [ class "material-icons" ] [ text "more_vert" ]
-            --     ]
-            --     , ul [ class "mdl-menu mdl-js-menu mdl-menu--bottom-right mdl-js-ripple-effect", mdlFor "menubutton"]
-            --         [ li [ class "mdl-menu__item" ] [ text "Github" ] ]
-            -- ]
-        ]
-    )
-
--- mdlFor: String -> Attribute msg
--- mdlFor value =
---     attribute "for" value
-
-entryList : Maybe (List String) -> Html Msg
-entryList entries =
-    case entries of
-        Nothing ->
-            (div [][])
-
-        Just entries ->
-        (let
-            listItem entry =
-                (li [ class "entries__item mdl-list__item" ]
-                [ span
-                    [ class "mdl-list__item-primary-content" ]
-                        [ i [ class "material-icons mdl-list__item-icon" ]
-                            [ text "person" ]
-                        , text (entry) ]
-                ]
-            )
-        in
-            div [ class "row entries" ] [ ul [ class "entries__list mdl-list" ] (List.map listItem entries) ])
-
-hideShow: Bool -> List (String, String)
-hideShow editmode =
-    case editmode of
-        True ->
-            [("display", "block")]
-
-        False ->
-            [("display", "none")]
+-- EVENT LISTENERS
 
 onEnter : Msg -> Attribute Msg
 onEnter msg =
@@ -208,51 +297,74 @@ onEnter msg =
             if code == 13 then
                 succeed msg
             else
-                succeed NoOp
+                fail "not ENTER"
     in
-        on "keydown" (Json.Decode.andThen isEnter keyCode)
+        on "keydown" (andThen isEnter keyCode)
 
-view : RoomModel -> Html Msg
+-- VIEWS
+
+-- hideShow: Bool -> List (String, String)
+-- hideShow editmode =
+--     case editmode of
+--         True ->
+--             [("display", "block")]
+
+--         False ->
+--             [("display", "none")]
+
+descriptionField: EventModel -> Html Msg
+descriptionField model =
+    (div [] [ 
+        ((\edit -> if (edit) then (textarea [ class "description-input mdl-textfield__input", tabindex 2, autofocus model.editing, onBlur PutDescription, onInput EditDescription ] [ text model.description ]) else (parseMarkdown model.description)) model.editing),
+        a [ attribute "href" "#" , class "material-icons", attribute "aria-label" "Edit description", attribute "title" "Edit description",  onClick EditDescriptionToggle ] [ text "mode_edit" ]]
+    )
+
+listParticipants: EventModel -> Html Msg
+listParticipants model =
+    case model.participants of
+        Nothing ->
+            (div [][])
+
+        Just participants ->
+            let
+                makeListItem = (\participant ->
+                    (li [ class "mdc-list-item" ] [
+                        img [ class "mdc-list-item__start-detail", attribute "src" "https://i.imgur.com/64YQrF7.png", attribute "width" "56", attribute "height" "56", attribute "alt" "Picture of someone"] [],
+                        ((\participant -> if (participant.edit) then (
+                            span [ class "mdc-text-field mdc-text-field--box mdc-text-field--with-trailing-icon mdc-text-field--upgraded" ] [
+                                input [ id "pre-filled", type_ "text", class "mdc-text-field__input", value participant.name, onInput ((\participant -> (\name -> EditParticipant participant name)) participant), onEnter (UpdateParticipant participant) ] [],
+                                label [ for "pre-filled", class "mdc-text-field__label mdc-text-field__label--float-above" ] [ text "Name" ],
+                                i [ class "material-icons mdc-text-field__icon", onClick (DeleteParticipant participant) ] [ text "delete" ],
+                                div [ class "mdc-text-field__bottom-line" ] []
+                            ]
+                        ) else (
+                            span [class "mdc-list-item__text"] [
+                                span [ class "participant-edit-fields"] [ text participant.name ],
+                                span [ class "mdc-list-item__secondary-text"] [ text participant.createdAtTimeSince ]
+                            ]
+                        )) participant),
+                        a [ attribute "href" "#", attribute "onClick" "event.preventDefault();" , class "mdc-list-item__end-detail material-icons", attribute "aria-label" "Edit participant toggle", attribute "title" "Edit participant toggle", onClick ((\part -> if (String.length part.name > 0) then (EditParticipantToggle part) else (NoOp)) participant)] [ text "mode_edit"] 
+                    ]))
+
+                addParticipant = (\model -> 
+                    (li [ class "mdc-list-item" ] [
+                        img [ class "mdc-list-item__start-detail", attribute "src" "https://i.imgur.com/64YQrF7.png", attribute "width" "56", attribute "height" "56", attribute "alt" "Picture of someone"] [],
+                        span [ class "mdc-text-field" ] [
+                                input [ id "new-participant", type_ "text", class "mdc-text-field__input", onInput NewParticipant, onEnter ((\part -> if (String.length part.name > 0) then PutParticipant else NoOp) model.newParticipant), value model.newParticipant.name  ] [],
+                                label [ for "new-participant", class "mdc-text-field__label" ] [ text "Name" ],
+                                div [ class "mdc-text-field__bottom-line" ] []
+                        ],
+                        a [ attribute "href" "#", class "mdc-list-item__end-detail material-icons", attribute "aria-label" "View more information", attribute "title" "More info", onClick ((\part -> if (String.length part.name > 0) then (PutParticipant) else (NoOp)) model.newParticipant)] [ text "add"]
+                    ]))
+                
+                -- divider = (li [ attribute "role" "separator", class "mdc-list-divider mdc-list-divider--inset"] [])
+            in 
+                (ul [ class "mdc-list mdc-list--two-line mdc-list--avatar-list participant-list" ] (List.append [(addParticipant model)] (List.map makeListItem participants)))
+
+view : EventModel -> Html Msg
 view model =
-    div [] [
-        menuComp
-        , div [ class "content" ]
-            [ div [ class "wrapper" ]
-                [ div [ class "column" ]
-                    [ div [ class "row description" ]
-                        [ div [ class "description__textbox mdl-textfield mdl-js-textfield"]
-                            [ textarea [  id "markdownInput"
-                                        , class "description__input mdl-textfield__input"
-                                        , rows 10
-                                        , name "markdownInput"
-                                        , style (hideShow model.editing)
-                                        , onInput StoreDescription
-                                        ] [ text model.description ]
-                            , div [ class "description__output" , id "markdownOutput" ] [ ]
-                            , div [ class "description__editwrapper"]
-                                [ i [ class "description__editbutton material-icons", onClick EditToggle ]
-                                    [ text "mode_edit" ] ]
-                            ]
-                        ]
-                    , div [ class "row entry" ]
-                        [ form [ ]
-                            [ div [ class "entry_textfield mdl-textfield mdl-js-textfield" ]
-                                [ input [ class "mdl-textfield__input"
-                                        , type_ "text", id "entryField"
-                                        , maxlength 100
-                                        , autofocus True
-                                        , onInput Input
-                                        , onEnter StoreEntry
-                                        , value model.currentEntry
-                                        ] [ ]
-                                  , label [ class "mdl-textfield__label", for "entryField" ] [ text "Navn" ]
-                                ]
-                            ]
-                            , button [ class "entry_button mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--colored"
-                                     , onClick StoreEntry ] [ i [ class "material-icons" ] [ text "add" ] ]
-                        ]
-                    , (entryList model.entries)
-                    ]
-                ]
-            ]
-    ]
+    (div [] [
+        div [ class "event-description" ][ descriptionField model ], 
+        listParticipants model
+    ])
+    
