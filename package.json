@@ -4,7 +4,8 @@
   "description": "Iterate event app",
   "main": "./app/bin/server.js",
   "engines": {
-    "node": "6.2.1"
+    "node": ">=6.0.0",
+    "npm": ">=3.0.0"
   },
   "scripts": {
     "lint": "jshint --exclude ./node_modules,./client",
