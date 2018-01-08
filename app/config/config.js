@@ -1,15 +1,16 @@
-/* jshint node: true, strict: true */
-
 "use strict";
 
-const   path    = require('path'),
-        fs      = require('fs'),
-        convict = require('convict'),
-        pckage  = require('../../package.json');
+const path    = require('path');
+const fs      = require('fs');
+const convict = require('convict');
+const pckage  = require('../../package.json');
 
-// Configuration schema
 
-let conf = convict({
+/*
+* Configuration schema
+*/
+
+const conf = convict({
     env: {
         doc     : "Applicaton environments",
         format  : ["development", "production"],
@@ -107,8 +108,9 @@ let conf = convict({
 });
 
 
-
-// Load config files
+/*
+* Load configuration
+*/
 
 if (fs.existsSync(path.resolve(__dirname, '../config/local.json'))) {
     conf.loadFile([path.resolve(__dirname, '../config/', conf.get('env') + '.json'), path.resolve(__dirname, '../config/local.json')]);
@@ -116,8 +118,10 @@ if (fs.existsSync(path.resolve(__dirname, '../config/local.json'))) {
     conf.loadFile([path.resolve(__dirname, '../config/', conf.get('env') + '.json')]);
 }
 
-// Validate all properties and export it
+
+/*
+* Validate all properties and export it
+*/
 
 conf.validate();
-
 module.exports = conf;
