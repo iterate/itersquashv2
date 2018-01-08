@@ -13,17 +13,6 @@ const fs          = require('fs');
 
 
 /*
-* Art
-*/
-
-fs.readFile('./.art', "ASCII", function(err, data) {
-    if(!err) {
-        log.info(data);
-    }
-});
-
-
-/*
 * Compile service worker
 */
 
