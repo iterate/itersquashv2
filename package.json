@@ -54,7 +54,6 @@
     "material-components-web": "^0.27.0",
     "moment": "^2.20.1",
     "node-sass": "^4.7.2",
-    "nodemailer": "2.6.4",
     "nodemon": "1.11.0",
     "pg": "^6.1.0",
     "pg-hstore": "^2.3.2",
