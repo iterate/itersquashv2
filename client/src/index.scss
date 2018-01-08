@@ -1,0 +1,78 @@
+@import "material-components-web/material-components-web";
+@import "@material/elevation/mdc-elevation";
+@import "@material/toolbar/mdc-toolbar";
+@import "@material/list/mdc-list";
+@import "@material/typography/mdc-typography";
+
+
+body {
+    display: flex;
+    min-height: 100vh;
+    justify-content: center;
+}
+
+footer {
+    align-self: center;
+}
+
+// Event description output
+
+.description-output {
+    font-family: Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    width: 100%;
+}
+
+.description-input {
+    min-height: 200px;
+    margin: 0;
+    padding: 0;
+    resize: none;
+    width: 100%;
+}
+
+.participant-edit-fields {
+    display: flex;
+}
+
+/* Override icon for delete participant */
+.material-icons.mdc-text-field__icon {
+    cursor: pointer;
+    pointer-events: initial;
+}
+
+.body-inner {
+    align-self: center;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    min-height: 100vh;
+    max-width: 800px;
+    width: 100%;
+
+    @include mdc-elevation(16, primary-dark, $opacity-boost: .1);
+}
+
+.body-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.elm-logo{
+    width: 23px;
+    padding-top: 3px;
+}
+
+.event-description {
+    padding: 10px;
+}
+
+.github-logo {
+    width: 30px;
+}
+
+.participant-list {
+
+}
+
+
+
