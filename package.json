@@ -50,7 +50,7 @@
     "gulp-nodemon": "^2.1.0",
     "hbs": "4.0.1",
     "jshint": "2.9.4",
-    "marked": "0.3.6",
+    "marked": "0.3.12",
     "material-components-web": "^0.27.0",
     "moment": "^2.20.1",
     "node-sass": "^4.7.2",
